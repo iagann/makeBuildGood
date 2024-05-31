@@ -16,52 +16,66 @@ public:
 	BuildMaker();
 	void makeGoodBuild() {
 		// control item sets
-		if (itemSet.hasEmpty()) {
+		if (items.hasEmpty()) {
 			std::cout << "Failed to make a build" << std::endl;
 			return;
 		}
 
 		// literally anything
-		ItemSet currentSet;
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::HELM).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::AMULET).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BOW).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::QUIVER).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BODY).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::RING).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::RING).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BELT).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::GLOVES).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BOOTS).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::RELIC).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BIG_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BIG_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BIG_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::BIG_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::SMALL_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::SMALL_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::SMALL_IDOL).begin());
-		currentSet.addItem(*itemSet.getItems(ITEM_TYPE::SMALL_IDOL).begin());
+		std::cout << "Generating initial build to start with" << std::endl;
+		currentItemSet.clear();
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::HELM).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::AMULET).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BOW).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::QUIVER).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BODY).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::RING).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::RING).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BELT).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::GLOVES).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BOOTS).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::RELIC).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BIG_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BIG_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BIG_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BIG_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::SMALL_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::SMALL_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::SMALL_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::SMALL_IDOL).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BLESSING_BLACK_SUN).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BLESSING_REIGN_OF_DRAGONS).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BLESSING_SPIRITS_OF_FIRE).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BLESSING_THE_AGE_OF_WINTER).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::BLESSING_ENDING_THE_STORM).begin());
+		currentItemSet.addItem(*items.getItems(ITEM_TYPE::SMALL_IDOL).begin());
 
-		calculatePassiveCombinations<SKILL_PASSIVE_NAME>(skills, STRINGS::SKILL_PASSIVE_NAME_MAP, PassiveCombination<SKILL_PASSIVE_NAME>());
-		//calculatePassiveCombinations<PASSIVE_NAME>(passives, calculatePassiveMinimums());
+		calculatePassiveCombinations<SKILL_PASSIVE_NAME>(skills, STRINGS::SKILL_PASSIVE_NAME_MAP, PassiveCombination<SKILL_PASSIVE_NAME>(), currentSkills);
+		calculatePassiveCombinations<PASSIVE_NAME>(passives, STRINGS::PASSIVE_NAME_MAP, calculatePassiveMinimums(), currentPassives);
+
+		calculateDps();
 	}
 	bool tests();
 
-	void addItemCandidate(Item item) { itemSet.addItem(item); }
+	void addItemCandidate(Item item) { items.addItem(item); }
 private:
 	const unsigned int passivePoints = 113;
-	//const unsigned int passivePoints = 92;
 
 	std::map<PASSIVE_NAME, Passive<PASSIVE_NAME>> passives;
-	std::set<PassiveCombination<PASSIVE_NAME>> universalCombinationSet;
+	PassiveCombination<PASSIVE_NAME> currentPassives;
+	PassiveCombination<PASSIVE_NAME> bestPassives;
 
 	std::map<SKILL_PASSIVE_NAME, Passive<SKILL_PASSIVE_NAME>> skills;
 	std::set<PassiveCombination<SKILL_PASSIVE_NAME>> skillSet;
 	std::set<PassiveCombination<SKILL_PASSIVE_NAME>> skillSetKestrel;
+	PassiveCombination<SKILL_PASSIVE_NAME> currentSkills;
+	PassiveCombination<SKILL_PASSIVE_NAME> bestSkills;
 
-	ItemSet itemSet;
-	ItemSet currentTtemSet;
+	ItemSet items;
+	ItemSet currentItemSet;
+	ItemSet bestItemSet;
+
+	std::map<STAT_NAME, std::vector<std::pair<std::string, double>>> currentStats;
 
 	void init();
 	void initPassives();
@@ -112,32 +126,33 @@ private:
 	}
 
 	template <typename T>
-	void calculatePassiveCombinations(std::map<T, Passive<T>> universalPassives, std::map<T, std::string> universalStrings, PassiveCombination<T> initCombo) {
-		std::set<PassiveCombination<T>> universalCombinationSet;
+	void calculatePassiveCombinations(std::map<T, Passive<T>> universalPassives, std::map<T, std::string> universalStrings, PassiveCombination<T> initCombo, PassiveCombination<T>& result) {
 		int totalPoints;
+		std::set<PassiveCombination<T>> universalPassiveConbinationSet;
 		if (std::is_same<T, PASSIVE_NAME>::value) {
 			totalPoints = passivePoints;
 		}
 		else if (std::is_same<T, SKILL_PASSIVE_NAME>::value) {
-			bool isKestrel = currentTtemSet.getAllStats().count(STAT_NAME::LEVEL_OF_BALLISTA) > 0 ? 25 : 24;
-			for (auto passive : universalPassives) {
-				initCombo.setPassivePoints(passive.first, passive.second.getClass(), passive.second.getAbsoluteMinimum());
-			}
-			totalPoints = isKestrel > 0 ? 25 : 24;
+			bool isKestrel = currentItemSet.getAllStats().count(STAT_NAME::LEVEL_OF_BALLISTA) > 0 ? 25 : 24;
+			totalPoints = (isKestrel > 0 ? 25 : 24) + 1; // + 1 for base skill stats
 		}
 		else {
 			throw std::string("passive type not suported: ") + typeid(T).name();
 		}
 
-		universalCombinationSet.clear();
-		universalCombinationSet.insert(initCombo);
+		for (auto passive : universalPassives) {
+			initCombo.setPassivePoints(passive.first, passive.second.getClass(), passive.second.getAbsoluteMinimum());
+		}
+
+		universalPassiveConbinationSet.clear();
+		universalPassiveConbinationSet.insert(initCombo);
 		const unsigned int unsingnedPoints = totalPoints - initCombo.totalPoints();
 		int numThreads = 1; // get_num_threads();
 		std::cout << "Initial combination has: " << initCombo.totalPoints() << " points, " << unsingnedPoints << " points to spend" << std::endl;
 
 		for (unsigned int i = 0; i < unsingnedPoints; ++i) {
 			std::vector<std::set<PassiveCombination<T>>> maybePassiveCombinationSet(numThreads);
-			std::vector<PassiveCombination<T>> passiveCombinationVector(universalCombinationSet.begin(), universalCombinationSet.end());
+			std::vector<PassiveCombination<T>> passiveCombinationVector(universalPassiveConbinationSet.begin(), universalPassiveConbinationSet.end());
 			//#pragma omp parallel for schedule(guided) /*shared(passiveCombinationVector)*/
 			for (int j = 0; j < passiveCombinationVector.size(); ++j) {
 				auto passiveCombination = passiveCombinationVector[j];
@@ -185,25 +200,26 @@ private:
 				}
 			}
 
-			universalCombinationSet.clear();
+			universalPassiveConbinationSet.clear();
 			for (int j = 0; j < numThreads; ++j) {
 				//std::cout << "Thread " << j << " found " << maybePassiveCombinationSet[j].size() << " combinatioins" << std::endl;
-				universalCombinationSet.insert(maybePassiveCombinationSet[j].begin(), maybePassiveCombinationSet[j].end());
+				universalPassiveConbinationSet.insert(maybePassiveCombinationSet[j].begin(), maybePassiveCombinationSet[j].end());
 			}
-			/*
-			auto top = *universalCombinationSet.begin();
-			universalCombinationSet.clear();
-			universalCombinationSet.insert(top);
-			*/
+			
+			auto top = *universalPassiveConbinationSet.begin();
+			universalPassiveConbinationSet.clear();
+			universalPassiveConbinationSet.insert(top);
+			
 			//printPassiveCombinationsSet(passiveCombinationSet);
-			std::cout << "Iteration " << (i + 1) << "/" << unsingnedPoints
-				<< " combination count " << universalCombinationSet.size() << std::endl;
-			std::cout << "===============================================================================================================" << std::endl;
+			//std::cout << "Iteration " << (i + 1) << "/" << unsingnedPoints << " combination count " << universalCombinationSet.size() << std::endl;
+			//std::cout << "===============================================================================================================" << std::endl;
 		}
 
-		printPassiveCombinationsSet(universalStrings, universalCombinationSet);
+		printPassiveCombinationsSet(universalStrings, universalPassiveConbinationSet);
 
-		std::cout << "Total combinations: " << universalCombinationSet.size() << std::endl;
+		result = *universalPassiveConbinationSet.begin();
+
+		//std::cout << "Total combinations: " << universalCombinationSet.size() << std::endl;
 	}
 	template <typename T>
 	void printPassiveCombinationsSet(std::map<T, std::string> universalStrings, std::set<PassiveCombination<T>> comboSet) {
@@ -280,6 +296,10 @@ private:
 		return combo.pointsCountMap.at(className);
 	}
 	unsigned int totalAbsoluteMinimum();
+
+	double calculateDps();
+	double statSum(STAT_NAME statName);
+	double statProduct(STAT_NAME statName);
 
 	int get_num_threads();
 };

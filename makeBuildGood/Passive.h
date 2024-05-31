@@ -3,6 +3,7 @@
 #include "enums.h"
 
 #include <map>
+#include <vector>
 
 template <typename T>
 class Passive {
@@ -22,7 +23,7 @@ public:
 		return *this;
 	}
 	Passive withStat(STAT_NAME stat, double value) {
-		statsMap.insert(std::make_pair(stat, value));
+		stats.push_back(std::make_pair(stat, value));
 		return *this;
 	}
 	Passive withMinimumClassPoints(PASSIVE_CLASS_NAME passiveClassName_, unsigned int points) {
@@ -42,7 +43,14 @@ public:
 
 	unsigned int getMaximumPoints() { return maxPoints; }
 	unsigned int getAbsoluteMinimum() { return absoluteMinimum; }
-	const std::map<STAT_NAME, double> getStats() { return statsMap; }
+	std::vector<std::pair<STAT_NAME, double>> getStats(int points) {
+		std::vector<std::pair<STAT_NAME, double>> result = stats;
+		for (auto& stat : result)
+			stat.second *= points;
+		if (thresholdStatLimit > 0 && points >= thresholdStatLimit)
+			result.push_back(std::make_pair(thresholdStatName, thresholdStatValue));
+		return result;
+	}
 	const PASSIVE_CLASS_NAME getClass() { return passiveClassName; }
 	unsigned int getMinimumClassPoints(PASSIVE_CLASS_NAME passiveClassName) {
 		auto it = minimumClassPointsMap.find(passiveClassName);
@@ -53,7 +61,7 @@ private:
 	unsigned int maxPoints;
 	unsigned int absoluteMinimum; // must be in the final result, but ignores dependency and skill point check
 
-	std::map<STAT_NAME, double> statsMap;
+	std::vector<std::pair<STAT_NAME, double>> stats;
 	unsigned int thresholdStatLimit;
 	STAT_NAME thresholdStatName;
 	double thresholdStatValue;

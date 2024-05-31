@@ -14,11 +14,11 @@ public:
 		: prevComboId(0)
 	{
 		if (std::is_same<T, PASSIVE_NAME>::value) {
-			lastAddedPassive = static_cast<T>(PASSIVE_NAME::NONE);
+			lastAddedPassive = static_cast<T>(PASSIVE_NAME::BASE_STATS);
 			pointsCountMap = { {PASSIVE_CLASS_NAME::BASE, 0}, {PASSIVE_CLASS_NAME::BLADEDANCER, 0}, {PASSIVE_CLASS_NAME::MARKSMAN, 0}, {PASSIVE_CLASS_NAME::FALCONER, 0} };
 		}
 		else if (std::is_same<T, SKILL_PASSIVE_NAME>::value) {
-			lastAddedPassive = static_cast<T>(PASSIVE_NAME::NONE);
+			lastAddedPassive = static_cast<T>(PASSIVE_NAME::BASE_STATS);
 			pointsCountMap = { {PASSIVE_CLASS_NAME::BASE, 0} };
 		}
 		else {
