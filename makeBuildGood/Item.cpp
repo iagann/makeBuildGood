@@ -20,30 +20,31 @@ bool Item::operator==(const Item& other) const {
 
 ItemSet::ItemSet() {
 	items = {
-		{ HELM, std::vector<Item>()},
-		{ AMULET, std::vector<Item>()},
-		{ BOW, std::vector<Item>()},
-		{ QUIVER, std::vector<Item>()},
-		{ BODY, std::vector<Item>()},
-		{ RING, std::vector<Item>()},
-		{ BELT, std::vector<Item>()},
-		{ GLOVES, std::vector<Item>()},
-		{ BOOTS, std::vector<Item>()},
-		{ RELIC, std::vector<Item>()},
-		{ BIG_IDOL, std::vector<Item>()},
-		{ SMALL_IDOL, std::vector<Item>()},
-		{ BLESSING_BLACK_SUN, std::vector<Item>()},
-		{ BLESSING_REIGN_OF_DRAGONS, std::vector<Item>()},
-		{ BLESSING_SPIRITS_OF_FIRE, std::vector<Item>()},
-		{ BLESSING_THE_AGE_OF_WINTER, std::vector<Item>()},
-		{ BLESSING_ENDING_THE_STORM, std::vector<Item>()},
+		{ HELM_SLOT, std::vector<Item>()},
+		{ AMULET_SLOT, std::vector<Item>()},
+		{ BOW_SLOT, std::vector<Item>()},
+		{ QUIVER_SLOT, std::vector<Item>()},
+		{ BODY_SLOT, std::vector<Item>()},
+		{ RING_LEFT_SLOT, std::vector<Item>()},
+		{ RING_RIGHT_SLOT, std::vector<Item>()},
+		{ BELT_SLOT, std::vector<Item>()},
+		{ GLOVES_SLOT, std::vector<Item>()},
+		{ BOOTS_SLOT, std::vector<Item>()},
+		{ RELIC_SLOT, std::vector<Item>()},
+		{ BIG_IDOL_1_SLOT, std::vector<Item>()}, { BIG_IDOL_2_SLOT, std::vector<Item>()}, { BIG_IDOL_3_SLOT, std::vector<Item>()}, { BIG_IDOL_4_SLOT, std::vector<Item>()},
+		{ SMALL_IDOL_1_SLOT, std::vector<Item>()}, { SMALL_IDOL_2_SLOT, std::vector<Item>()}, { SMALL_IDOL_3_SLOT, std::vector<Item>()}, { SMALL_IDOL_4_SLOT, std::vector<Item>()},
+		{ BLESSING_BLACK_SUN_SLOT, std::vector<Item>()},
+		{ BLESSING_REIGN_OF_DRAGONS_SLOT, std::vector<Item>()},
+		{ BLESSING_SPIRITS_OF_FIRE_SLOT, std::vector<Item>()},
+		{ BLESSING_THE_AGE_OF_WINTER_SLOT, std::vector<Item>()},
+		{ BLESSING_ENDING_THE_STORM_SLOT, std::vector<Item>()},
 	};
 }
 
 std::vector<Item> ItemSet::getAllItems() {
 	std::vector<Item> result;
-	for (auto itemType : items) {
-		auto itemsByType = getItems(itemType.first);
+	for (auto itemSlot : items) {
+		auto itemsByType = getItems(itemSlot.first);
 		result.insert(result.end(), itemsByType.begin(), itemsByType.end());
 	}
 	return result;
@@ -52,7 +53,7 @@ std::vector<Item> ItemSet::getAllItems() {
 bool ItemSet::hasEmpty() {
 	for (auto itemType : items) {
 		if (itemType.second.empty()) {
-			std::cout << STRINGS::ITEM_TYPE_MAP.at(itemType.first) << " is missing from the item set, cannot make a build" << std::endl;
+			std::cout << STRINGS::ITEM_SLOT_MAP.at(itemType.first) << " is missing from the item set, cannot make a build" << std::endl;
 			return true;
 		}
 	}

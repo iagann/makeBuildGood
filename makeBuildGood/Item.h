@@ -27,8 +27,8 @@ private:
 class ItemSet {
 public:
 	ItemSet();
-	void addItem(Item item) { items.at(item.getType()).push_back(item); }
-	std::vector<Item>& getItems(ITEM_TYPE type) { return items.at(type); }
+	void addItem(ITEM_SLOT slot, Item item) { items.at(slot).push_back(item); }
+	std::vector<Item>& getItems(ITEM_SLOT slot) { return items.at(slot); }
 	std::vector<Item> getAllItems();
 	bool hasEmpty();
 	void clear() { for (auto itemType : items) itemType.second.clear(); }
@@ -37,5 +37,5 @@ public:
 	bool operator<(const ItemSet& other) const;
 	bool operator==(const ItemSet& other) const;
 private:
-	std::map<ITEM_TYPE, std::vector<Item>> items;
+	std::map<ITEM_SLOT, std::vector<Item>> items;
 };
