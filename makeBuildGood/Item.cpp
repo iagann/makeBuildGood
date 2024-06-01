@@ -1,10 +1,24 @@
 #include "Item.h"
 
 #include <iostream>
+#include <sstream>
 
 Item Item::withStat(STAT_NAME stat, double value) {
 	stats.push_back(std::make_pair(stat, value));
 	return *this;
+}
+
+std::string Item::toString() {
+	std::stringstream ss;
+	ss << getName() << " (" << STRINGS::ITEM_TYPE_MAP.at(getType()) << "): ";
+	bool first = true;
+	for (auto stat : stats) {
+		if (!first)
+			ss << ", ";
+		ss << STRINGS::STAT_NAME_MAP.at(stat.first) << " = " << stat.second;
+		first = false;
+	}
+	return ss.str();
 }
 
 bool Item::operator<(const Item& other) const {
@@ -50,10 +64,18 @@ std::vector<Item> ItemSet::getAllItems() {
 	return result;
 }
 
+std::map<ITEM_SLOT, Item> ItemSet::getItemSet() {
+	std::map<ITEM_SLOT, Item> result;
+	for (auto slot : items) {
+		result.insert(std::make_pair(slot.first, slot.second.at(0)));
+	}
+	return result;
+}
+
 bool ItemSet::hasEmpty() {
-	for (auto itemType : items) {
-		if (itemType.second.empty()) {
-			std::cout << STRINGS::ITEM_SLOT_MAP.at(itemType.first) << " is missing from the item set, cannot make a build" << std::endl;
+	for (auto slot : items) {
+		if (slot.second.empty()) {
+			std::cout << STRINGS::ITEM_SLOT_MAP.at(slot.first) << " is missing from the item set, cannot make a build" << std::endl;
 			return true;
 		}
 	}

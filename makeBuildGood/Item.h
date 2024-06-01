@@ -15,9 +15,11 @@ public:
 	std::vector<std::pair<STAT_NAME, double>> getStats() { return stats; }
 	const ITEM_TYPE getType() { return itemType; }
 	const std::string getName() { return name; }
+	std::string toString();
 
 	bool operator<(const Item& other) const;
 	bool operator==(const Item& other) const;
+	bool operator!=(const Item& other) const { return !this->operator==(other); }
 private:
 	ITEM_TYPE itemType;
 	std::string name;
@@ -30,6 +32,10 @@ public:
 	void addItem(ITEM_SLOT slot, Item item) { items.at(slot).push_back(item); }
 	std::vector<Item>& getItems(ITEM_SLOT slot) { return items.at(slot); }
 	std::vector<Item> getAllItems();
+	Item getItem(ITEM_SLOT slot) { return items.at(slot).at(0); }
+	std::map<ITEM_SLOT, Item> getItemSet();
+	std::map<ITEM_SLOT, std::vector<Item>> getAllItemSet() { return items; }
+	void changeItem(ITEM_SLOT slot, Item item) { items.at(slot) = std::vector<Item>{ item }; }
 	bool hasEmpty();
 	void clear() { for (auto itemType : items) itemType.second.clear(); }
 	std::map<STAT_NAME, std::vector<double>> getAllStats();

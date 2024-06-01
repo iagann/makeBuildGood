@@ -11,6 +11,7 @@
 BuildMaker::BuildMaker() {
 	init();
 	verbose = 1;
+	stacks = true;
 }
 
 void BuildMaker::init() {
@@ -91,7 +92,7 @@ void BuildMaker::initPassives() {
 		.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 5)
 		.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 20)
 		.withDependency(PASSIVE_NAME::WOUND_MAKER, 1)
-		.withAbsoluteMinimum(5)
+		//.withAbsoluteMinimum(5)
 	));
 	// FALCONER
 	passives.insert(std::make_pair(
@@ -225,6 +226,11 @@ void BuildMaker::initSkills() {
 			.withAbsoluteMinimum(1)
 		));
 		skills.insert(std::make_pair(
+			SKILL_PASSIVE_NAME::HEAVY_BOLTS, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 3)
+			.withStat(STAT_NAME::MORE_DAMAGE, 12)
+			.withStat(STAT_NAME::MORE_ATTACK_SPEED, -5)
+		));
+		skills.insert(std::make_pair(
 			SKILL_PASSIVE_NAME::LIGHT_BOLTS, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 3)
 			.withDependency(SKILL_PASSIVE_NAME::EFFICIENT_CONSTRUCTION, 1)
 			.withStat(STAT_NAME::MORE_ATTACK_SPEED, 12)
@@ -280,30 +286,30 @@ void BuildMaker::initSkills() {
 		initCombo.setPassivePoints(skill.first, skill.second.getClass(), skill.second.getAbsoluteMinimum());
 	}
 
+	auto shared0 = initCombo;
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); //2
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
+	skillSet.push_back(shared0);
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 0); // 0
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::LIGHT_BOLTS, PASSIVE_CLASS_NAME::BASE, 2); // 1
+	skillSet.push_back(shared0);
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
+	skillSetKestrel.push_back(shared0);
+
 	auto shared1 = initCombo;
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::RAPID_FIRE, PASSIVE_CLASS_NAME::BASE, 2); // 1
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
-	skillSet.insert(shared1);
+	skillSet.push_back(shared1);
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); // 2
-	skillSetKestrel.insert(shared1);
+	skillSetKestrel.push_back(shared1);
 
 	auto shared2 = initCombo;
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::RAPID_FIRE, PASSIVE_CLASS_NAME::BASE, 2); // 1
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 2); //2
-	skillSet.insert(shared2);
+	skillSet.push_back(shared2);
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
-	skillSetKestrel.insert(shared2);
-
-	auto shared0 = initCombo;
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); //2
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
-	skillSet.insert(shared0);
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 0); // 0
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::LIGHT_BOLTS, PASSIVE_CLASS_NAME::BASE, 2); // 1
-	skillSet.insert(shared0);
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
-	skillSetKestrel.insert(shared0);
+	skillSetKestrel.push_back(shared2);
 }
 
 bool BuildMaker::tests() {
@@ -360,18 +366,28 @@ double BuildMaker::calculateDps() {
 }
 
 double BuildMaker::calculateDpsIf(ItemSet ifItemSet) {
+	currentItemSet = ifItemSet;
+	int prevVerbose = verbose;
+	//verbose = 0;
+	findBestSkills();
+	verbose = prevVerbose;
 	return calculateDpsIf(currentSkills);
 }
 
 double BuildMaker::calculateDpsIf(PassiveCombination<SKILL_PASSIVE_NAME> ifSkills) {
-	return calculateDpsIf(currentPassives);
+	currentSkills = ifSkills;
+	int prevVerbose = verbose;
+	//verbose = 0;
+	findBestPassives();
+	verbose = prevVerbose;
+	return calculateDpsIf(bestPassives);
 }
 
 double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	currentStats.clear();
 	// PASSIVES
 	{
-		for (auto passive : currentPassives.getPassives()) {
+		for (auto passive : ifPassives.getPassives()) {
 			if (passive.first == PURSUIT)
 				int fdsf = 1;
 			auto passiveDefinition = passives.at(passive.first);
@@ -432,7 +448,9 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	}
 	if (verbose==2) std::cout << "==================================== CALCULATING DAMAGE ====================================" << std::endl;
 	{
-		double dex = statSum(DEXTERITY);
+		double allStats = statSum(ALL_ATRIBUTES);
+		if (verbose >= 2) std::cout << "ALL ATTRIBUTES: " << allStats << std::endl << std::endl;
+		double dex = statSum(DEXTERITY) + allStats;
 		if (verbose >= 2) std::cout << "DEXTERITY: " << dex << std::endl << std::endl;
 
 		double damageRatio = statSum(DAMAGE_STAT_RATIO) / 100;
@@ -468,6 +486,8 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl << std::endl;
 		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4) / 5;
 		if (verbose >= 2) std::cout << "DIVE BOMB HITS PER SECOND: " << hitsPerSecondDiveBomb << std::endl << std::endl;
+		if (!stacks) hitsPerSecondFalcon = 0;
+		if (!stacks) hitsPerSecondDiveBomb = 0;
 
 		double increasedDamagePerDex = dex * statSum(INCREASED_MINION_DAMAGE_PER_DEXTERITY);
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE PER DEXTERITY: " << increasedDamagePerDex << std::endl;
@@ -481,7 +501,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "INCREASED MINION PHYSICAL DAMAGE: " << increasedMinionPhys << std::endl;
 		double increasedCold = statSum(INCREASED_COLD_DAMAGE) * damageRatio / 100;
 		if (verbose >= 2) std::cout << "INCREASED COLD DAMAGE: " << increasedCold << std::endl;
-		double intelligence = statSum(INTELLIGENCE);
+		double intelligence = statSum(INTELLIGENCE) + allStats;
 		if (verbose >= 2) std::cout << "INTELLIGENCE: " << intelligence << std::endl;
 		double moreDamage = (100 + statProduct(MORE_DAMAGE)) / 100 * (100 + intelligence * statSum(MORE_DAMAGE_PER_INTELLIGENCE));
 		if (verbose >= 2) std::cout << "MORE DAMAGE: " << moreDamage << "%" << std::endl;
@@ -490,9 +510,10 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double moreDamageDiveBomb = ((moreDamageFalcon + 100) / 100 * (1 + 0.04 * 4) * (1 + 0.04 * 4)) * 100;
 		if (verbose >= 2) std::cout << "MORE DAMAGE DIVE BOMB: " << moreDamageDiveBomb << "%" << std::endl << std::endl;
 
-		double ailmentRatio = statSum(AILMENT_STAT_RATIO) / 100 + 0.25;
+		double ailmentRatio = statSum(AILMENT_STAT_RATIO) / 100;
 		if (verbose >= 2) std::cout << "SHARED AILMENTS RATIO: " << (ailmentRatio * 100) << "%" << std::endl;
 		double averageStacks = 4 * (ailmentRatio * hitsPerSecond + 2 * hitsPerSecondFalcon) / 100;
+		if (!stacks) averageStacks = 0;
 		if (verbose >= 2) std::cout << "AVERAGE AILMENT STACKS FOR 1% chance: " << averageStacks << std::endl;
 		double critVulnerabilityChance = statSum(CRITICAL_VULNERABILITY_CHANCE);
 		if (verbose >= 2) std::cout << "CHANCE TO APPLY CRIT VULNERABILITY: " << critVulnerabilityChance << "%" << std::endl;
@@ -517,6 +538,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double armourShredEffect = statSum(ARMOUR_SHRED_EFFECT);
 		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
 		double averageArmourShred = 4 * (ailmentRatio * hitsPerSecond * (100 + armourShredEffect) / 100 + 2 * hitsPerSecondFalcon) * (armourShredChance + hitsPerSecondDiveBomb * 2);
+		if (!stacks) averageArmourShred = 0;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED: " << averageArmourShred << std::endl;
 		double physArmorShredMore = 100 * (1.2 * averageArmourShred / (80 + 0.05 * pow(105, 2) + 1.2 * averageArmourShred) * 0.3
 			+ 0.0012 * pow(averageArmourShred, 2) / (180 * 105 + 0.0015 * pow(averageArmourShred, 2)) * 0.55);
@@ -592,15 +614,132 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 }
 
 void BuildMaker::findBestItems() {
-
+	double currentDpsCopy;
+	ItemSet currentItemSetCopy;
+	for (auto slotItems : items.getAllItemSet()) {
+		if (slotItems.second.size() < 2)
+			continue;
+		if (verbose >= 1) std::cout << std::endl << "ANALYZING " << STRINGS::ITEM_SLOT_MAP.at(slotItems.first) << std::endl;
+		currentDpsCopy = bestDps;
+		currentItemSetCopy = bestItemSet;
+		if (slotItems.second.size() < 2)
+			continue;
+		std::map<double, std::pair<Item, ItemSet>> maybeNewItemsMap;
+		for (auto item : slotItems.second) {
+			//std::cout << std::endl;
+			auto maybeItemSet = currentItemSetCopy;
+			maybeItemSet.changeItem(slotItems.first, item);
+			auto newDps = calculateDpsIf(maybeItemSet);
+			maybeNewItemsMap.insert(std::make_pair(newDps, std::make_pair(item, maybeItemSet)));
+			//if (verbose >= 1) std::cout << newDps << " - " << item.toString() << std::endl;
+		}
+		auto newDps = maybeNewItemsMap.rbegin()->first;
+		auto newItem = maybeNewItemsMap.rbegin()->second.first;
+		if (newDps > currentDpsCopy) {
+			if (verbose >= 1) {
+				std::cout << std::endl << "Changing item for more DPS " << currentDpsCopy << " -> " << newDps << " +" << (newDps / currentDpsCopy - 1) * 100 << "%: " << " " << std::endl;
+				std::cout << "from: " << currentItemSetCopy.getItem(slotItems.first).toString() << std::endl;
+				std::cout << "to  : " << newItem.toString() << std::endl;
+			}
+			
+		}
+		else {
+			if (verbose >= 1) {
+				//std::cout << std::endl << "NOTHING BETTER WAS FOUND, current DPS = " << bestDps << std::endl;
+			}
+		}
+		bestDps = newDps;
+		currentDps = bestDps;
+		currentItemSet = maybeNewItemsMap.rbegin()->second.second;
+		bestItemSet = currentItemSet;
+	}
+	//if (verbose >= 1) std::cout << std::endl;
 }
 
 void BuildMaker::findBestSkills() {
-
+	auto currentDpsCopy = bestDps;
+	auto currentSkillsCopy = bestSkills;
+	bool isKestrel = currentItemSet.getAllStats().count(STAT_NAME::LEVEL_OF_BALLISTA) > 0;
+	auto maybeSkillsSet = isKestrel ? skillSetKestrel : skillSet;
+	std::map<double, PassiveCombination<SKILL_PASSIVE_NAME>> maybeSkillsMap;
+	for (auto maybeSkills : maybeSkillsSet) {
+		maybeSkillsMap.insert(std::make_pair(calculateDpsIf(maybeSkills), maybeSkills));
+	}
+	auto newDps = maybeSkillsMap.rbegin()->first;
+	auto newSkills = maybeSkillsMap.rbegin()->second;
+	if (maybeSkillsMap.rbegin()->second != currentSkillsCopy) {
+		if (verbose >= 1) {
+			std::cout << "Changing skill set for more DPS " << currentDps << " -> " << newDps << " +" << (newDps / currentDps - 1) * 100 << "%: "
+				<< maybeSkillsMap.rbegin()->second.toString(STRINGS::SKILL_PASSIVE_NAME_MAP) << std::endl << std::endl;
+			for (auto skill : currentSkillsCopy.getPassives()) {
+				if (newSkills.getPassivePoints(skill.first) != skill.second)
+					std::cout << STRINGS::SKILL_PASSIVE_NAME_MAP.at(skill.first) << ": " << skill.second << " -> " << newSkills.getPassivePoints(skill.first) << std::endl;
+			}
+		}
+	}
+	currentSkills = maybeSkillsMap.rbegin()->second;
+	bestSkills = currentSkills;
+	bestDps = newDps;
+	currentDps = bestDps;
+	//currentSkills = currentSkillsCopy;
+	//if (verbose >= 1) std::cout << std::endl;
 }
 
 void BuildMaker::findBestPassives() {
+	bestDpsFound = false;
+	currentDps = calculateDpsIf(minimumPassives);
+	findBestPassives(minimumPassives, passivePoints - minimumPassives.totalPoints(), bestDps);
+	//if (verbose >= 1) std::cout << std::endl;
+}
 
+void BuildMaker::findBestPassives(PassiveCombination<PASSIVE_NAME>& combo, int pointsLeft, double currentDpsCopy) {
+	if (pointsLeft == 0) {
+		passiveDependencyCache.clear();
+		if (!dependencySatisfied(passives, combo, passiveDependencyCache))
+			return;
+
+		bestDpsFound = true;
+		if (currentDpsCopy > bestDps && bestPassives != combo) {
+			if (verbose >= 1) {
+				/*
+				std::cout << "Changing passives for more DPS " << bestDps << " -> " << currentDpsCopy << " +" << (currentDpsCopy / bestDps - 1) * 100 << "%: " << std::endl;
+				for (auto passive : bestPassives.getPassives()) {
+					if (combo.getPassivePoints(passive.first) != passive.second)
+						std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << passive.second 
+							<< " -> " << combo.getPassivePoints(passive.first) << std::endl;
+				}
+				std::cout << std::endl;
+				*/
+			}
+			bestDpsFound = true;
+			bestDps = currentDpsCopy;
+			currentDps = bestDps;
+			bestPassives = combo;
+			bestSkills = currentSkills;
+			bestItemSet = currentItemSet;
+			//if (verbose >= 1) std::cout << "New best DPS: " << bestDps << std::endl;
+			//return;
+		}
+		return;
+	}
+
+	std::map<double, std::pair<PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>>> maybeNewPassiveMap;
+	for (auto passive : combo.getPassives()) {
+		if (passive.second < passives.at(passive.first).getMaximumPoints()) {
+			auto maybeCombo = combo;
+			maybeCombo.addPassivePoint(passive.first, passives.at(passive.first).getClass());
+			if (dependencySatisfied(passives, maybeCombo, passiveDependencyCache))
+				maybeNewPassiveMap.insert(std::make_pair(calculateDpsIf(maybeCombo), std::make_pair(passive.first, maybeCombo)));
+		}
+	}
+	for (auto maybeIt = maybeNewPassiveMap.rbegin(); maybeIt != maybeNewPassiveMap.rend(); ++maybeIt) {
+		//printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, maybeIt->second.second);
+		//std::cout << pointsLeft << " " << STRINGS::PASSIVE_NAME_MAP.at(maybeIt->second.first) << " passiveDependencyCache.size() = " << passiveDependencyCache.size() << std::endl;
+		if (verbose>=2) std::cout << maybeIt->first << " " << STRINGS::PASSIVE_NAME_MAP.at(maybeIt->second.first) << std::endl;
+		findBestPassives(maybeIt->second.second, pointsLeft - 1, maybeIt->first);
+		if (bestDpsFound)
+			return;
+	}
 }
 
 double BuildMaker::statSum(STAT_NAME statName) {

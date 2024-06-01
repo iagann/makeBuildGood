@@ -52,8 +52,8 @@ public:
 		}
 	}
 	//unsigned int totalPoints();
-	std::map<T, unsigned int>& getPassives() { return passives; }
-	unsigned int passivePoints(T passiveName) const {
+	std::map<T, unsigned int> getPassives() { return passives; }
+	unsigned int getPassivePoints(T passiveName) const {
 		auto it = passives.find(passiveName);
 		return (it != passives.end()) ? it->second : 0;
 	}
@@ -69,12 +69,12 @@ public:
 	std::string toString(std::map<T, std::string> universalStrings) {
 		std::stringstream ss;
 		bool first = true;
-		ss << prevComboId << ":" << universalStrings.at(lastAddedPassive) << ":" << (passives.at(lastAddedPassive) - 1) << "->" << passives.at(lastAddedPassive) << std::endl;
+		//ss << prevComboId << ":" << universalStrings.at(lastAddedPassive) << ":" << (passives.at(lastAddedPassive) - 1) << "->" << passives.at(lastAddedPassive) << std::endl;
 		for (auto& passive : passives) {
 			ss << (first ? "" : ",") << universalStrings.at(passive.first) << "=" << passive.second;
 			first = false;
 		}
-		ss << std::endl << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+		//ss << std::endl << "---------------------------------------------------------------------------------------------------------------" << std::endl;
 		//ss << "===============================================================================================================" << std::endl;
 		return ss.str();
 	}
@@ -85,6 +85,10 @@ public:
 
 	bool operator==(const PassiveCombination& other) const {
 		return passives == other.passives;
+	}
+
+	bool operator!=(const PassiveCombination& other) const {
+		return passives != other.passives;
 	}
 
 	T lastAddedPassive;
