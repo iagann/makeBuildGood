@@ -12,10 +12,17 @@
 
 #include <omp.h>
 
+#include <chrono>
+
 class BuildMaker {
 public:
 	BuildMaker();
 	void makeGoodBuild() {
+		using std::chrono::high_resolution_clock;
+		using std::chrono::duration_cast;
+		using std::chrono::duration;
+		using std::chrono::milliseconds;
+		auto t1 = high_resolution_clock::now();
 		// control item sets
 		if (items.hasEmpty()) {
 			std::cout << "Failed to make a build" << std::endl;
@@ -83,6 +90,9 @@ public:
 		std::cout << std::endl;
 		printPassiveCombination(STRINGS::SKILL_PASSIVE_NAME_MAP, bestSkills);
 		std::cout << std::endl << "DPS: " << bestDps << std::endl;
+		auto t2 = high_resolution_clock::now();
+		duration<double, std::milli> ms_double = t2 - t1;	
+		std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl;
 	}
 	bool tests();
 

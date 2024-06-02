@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include <set>
+#include <list>
 
 
 BuildMaker::BuildMaker() {
@@ -409,7 +410,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		for (auto passive : ifPassives.getPassives()) {
 			if (passive.first == PURSUIT)
 				int fdsf = 1;
-			auto passiveDefinition = passives.at(passive.first);
+			Passive<PASSIVE_NAME>& passiveDefinition = passives.at(passive.first);
 			auto stats = passiveDefinition.getStats(passive.second);
 			for (auto stat : stats) {
 				if (verbose >= 2) std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << STRINGS::STAT_NAME_MAP.at(stat.first) << " = " << stat.second << std::endl;
@@ -708,7 +709,7 @@ void BuildMaker::findBestSkills() {
 
 void BuildMaker::findBestPassives() {
 	bestDpsFound = false;
-	currentDps = calculateDpsIf(minimumPassives);
+	//currentDps = calculateDpsIf(minimumPassives);
 	findBestPassives(minimumPassives, passivePoints - minimumPassives.totalPoints(), bestDps);
 	//if (verbose >= 1) std::cout << std::endl;
 }
