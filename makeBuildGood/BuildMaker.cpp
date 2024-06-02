@@ -4,15 +4,21 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <algorithm>
 
 #include <set>
 #include <list>
 
 
-BuildMaker::BuildMaker() {
-	init();
+BuildMaker::BuildMaker()
+	: num_threads(get_num_threads())
+{
 	verbose = 1;
 	stacks = true;
+	reversePassiveSearch = true;
+	disableCriticalVulnerability = false;
+
+	init();
 }
 
 void BuildMaker::init() {
@@ -21,161 +27,174 @@ void BuildMaker::init() {
 }
 
 void BuildMaker::initPassives() {
-	// BASE CLASS
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::SWIFT_ASSASSIN, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 8)
+	// VALUES
+	{
+		// BASE CLASS
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::SWIFT_ASSASSIN, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 8)
 			.withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::STEADY_HAND, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 8)
-		.withStat(STAT_NAME::DEXTERITY, 1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::GUILE, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::EVASION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 5)
-		.withDependency(PASSIVE_NAME::GUILE, 1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::AGILITY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 5)
-		.withStat(STAT_NAME::INCREASED_DAMAGE_PER_MOVEMENT_SPEED, 0.2)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 10)
-		.withDependency(PASSIVE_NAME::EVASION, 1)
-	));
-	// BLADEDANCER
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::CLOAK_OF_SHADOWS, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BLADEDANCER, 8)
-		.withStat(STAT_NAME::DEXTERITY, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::PURSUIT, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BLADEDANCER, 5)
-		.withThresholdStat(5, STAT_NAME::INCREASED_MOVEMENT_SPEED, 8)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
-		.withAbsoluteMinimum(5)
-	));
-	// MARKSMAN
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::FOCUS_FIRE, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
-		.withStat(STAT_NAME::DEXTERITY, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::ASSASSINS_QUIVER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
-		.withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 1)
-		.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 5)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
-		.withAbsoluteMinimum(1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::MISSILE_MASTERY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 10)
-		.withStat(STAT_NAME::INCREASED_DAMAGE, 5)
-		.withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 5)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::CONCENTRATION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
-		.withStat(STAT_NAME::INCREASED_DAMAGE, 15)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::WOUND_MAKER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 2)
-		.withStat(STAT_NAME::CRITICAL_VULNERABILITY_CHANCE, 10)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 10)
-		.withDependency(PASSIVE_NAME::ASSASSINS_QUIVER, 1)
-		.withAbsoluteMinimum(2)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::HEIGHTENED_SENCES, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
-		.withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 7)
-		.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 5)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 20)
-		.withDependency(PASSIVE_NAME::WOUND_MAKER, 1)
-		//.withAbsoluteMinimum(5)
-	));
-	// FALCONER
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::HANDLER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 8)
-		.withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 7)
-		.withThresholdStat(5, STAT_NAME::BASE_MINION_CRITICAL_STRIKE_CHANCE, 5)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
-		.withAbsoluteMinimum(8)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::AGILE_HUNT, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 8)
-		.withStat(STAT_NAME::DEXTERITY, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 5)
-		.withAbsoluteMinimum(8)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::RANGERS_MARK, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 7)
-		.withStat(STAT_NAME::INCREASED_DAMAGE, 6)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 10)
-		.withAbsoluteMinimum(3)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::TACTITIAN, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
-		.withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 3)
-		.withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE_FALCON, 3)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 15)
-		.withDependency(PASSIVE_NAME::HANDLER, 1)
-		.withAbsoluteMinimum(6)
-	));
-	// FALCONER part 2
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::COORDINATED_FADE, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 25)
-		.withAbsoluteMinimum(1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::EVASION_TACTICS, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
-		.withStat(STAT_NAME::DEXTERITY, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 25)
-		.withAbsoluteMinimum(4)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::INTUITIVE_CONNECTION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 1)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 30)
-		.withAbsoluteMinimum(1)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::RELENTLESS_TALONS, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 5)
-		.withStat(STAT_NAME::INCREASED_DAMAGE, 6)
-		.withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 6)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 30)
-		.withDependency(PASSIVE_NAME::EVASION_TACTICS, 1)
-		.withAbsoluteMinimum(2)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::NEEDLE_LIKE_PRECISION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
-		.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 6)
-		.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 6)
-		.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_CHANCE, 6)
-		.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 6)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 35)
-		.withAbsoluteMinimum(5)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::EXPEDIENCY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 5)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
-		.withAbsoluteMinimum(5)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::FINESSE_THEM, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 7)
-		.withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 5)
-		.withThresholdStat(0, STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER_PER_CRITICAL_STRIKE_AVOIDANCE, 1.5)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
-		.withDependency(PASSIVE_NAME::NEEDLE_LIKE_PRECISION, 2)
-		.withAbsoluteMinimum(5)
-	));
-	passives.insert(std::make_pair(
-		PASSIVE_NAME::TAILWIND, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
-		.withStat(STAT_NAME::INCREASED_MOVEMENT_SPEED, 2)
-		.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
-		.withAbsoluteMinimum(6)
-	));
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::STEADY_HAND, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 8)
+			.withStat(STAT_NAME::DEXTERITY, 1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::GUILE, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::EVASION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 5)
+			.withDependency(PASSIVE_NAME::GUILE, 1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::AGILITY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 5)
+			.withStat(STAT_NAME::INCREASED_DAMAGE_PER_MOVEMENT_SPEED, 0.2)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 10)
+			.withDependency(PASSIVE_NAME::EVASION, 1)
+		));
+		// BLADEDANCER
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::CLOAK_OF_SHADOWS, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BLADEDANCER, 8)
+			.withStat(STAT_NAME::DEXTERITY, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::PURSUIT, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::BLADEDANCER, 5)
+			.withThresholdStat(5, STAT_NAME::INCREASED_MOVEMENT_SPEED, 8)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
+			.withAbsoluteMinimum(5)
+		));
+		// MARKSMAN
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::FOCUS_FIRE, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
+			.withStat(STAT_NAME::DEXTERITY, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::ASSASSINS_QUIVER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
+			.withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 1)
+			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 8)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
+			.withAbsoluteMinimum(1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::MISSILE_MASTERY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 10)
+			.withStat(STAT_NAME::INCREASED_DAMAGE, 5)
+			.withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 5)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::CONCENTRATION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
+			.withStat(STAT_NAME::INCREASED_DAMAGE, 15)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::WOUND_MAKER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 2)
+			.withStat(STAT_NAME::CRITICAL_VULNERABILITY_CHANCE, 10)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 10)
+			.withDependency(PASSIVE_NAME::ASSASSINS_QUIVER, 1)
+			.withAbsoluteMinimum(2)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::HEIGHTENED_SENCES, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
+			.withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 7)
+			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 5)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 20)
+			.withDependency(PASSIVE_NAME::WOUND_MAKER, 1)
+			//.withAbsoluteMinimum(5)
+		));
+		// FALCONER
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::HANDLER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 8)
+			.withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 7)
+			.withThresholdStat(5, STAT_NAME::BASE_MINION_CRITICAL_STRIKE_CHANCE, 5)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
+			.withAbsoluteMinimum(8)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::AGILE_HUNT, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 8)
+			.withStat(STAT_NAME::DEXTERITY, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 5)
+			.withAbsoluteMinimum(8)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::RANGERS_MARK, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 7)
+			.withStat(STAT_NAME::INCREASED_DAMAGE, 6)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 10)
+			.withAbsoluteMinimum(3)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::TACTITIAN, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
+			.withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 3)
+			.withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE_FALCON, 3)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 15)
+			.withDependency(PASSIVE_NAME::HANDLER, 1)
+			.withAbsoluteMinimum(6)
+		));
+		// FALCONER part 2
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::COORDINATED_FADE, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 25)
+			.withAbsoluteMinimum(1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::EVASION_TACTICS, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
+			.withStat(STAT_NAME::DEXTERITY, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 25)
+			.withAbsoluteMinimum(4)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::INTUITIVE_CONNECTION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 30)
+			.withAbsoluteMinimum(1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::RELENTLESS_TALONS, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 5)
+			.withStat(STAT_NAME::INCREASED_DAMAGE, 6)
+			.withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 6)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 30)
+			.withDependency(PASSIVE_NAME::EVASION_TACTICS, 1)
+			.withAbsoluteMinimum(2)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::NEEDLE_LIKE_PRECISION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
+			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 6)
+			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 6)
+			.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_CHANCE, 6)
+			.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 6)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 35)
+			.withAbsoluteMinimum(2)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::EXPEDIENCY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 5)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
+			.withAbsoluteMinimum(5)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::FINESSE_THEM, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 7)
+			.withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 5)
+			.withThresholdStat(5, STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER_PER_CRITICAL_STRIKE_AVOIDANCE, 1.5)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
+			.withDependency(PASSIVE_NAME::NEEDLE_LIKE_PRECISION, 2)
+			.withAbsoluteMinimum(5)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::TAILWIND, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 6)
+			.withStat(STAT_NAME::INCREASED_MOVEMENT_SPEED, 2)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
+			.withAbsoluteMinimum(6)
+		));
+	}
+
+	if (reversePassiveSearch) {
+		minimumPassives = PassiveCombination<PASSIVE_NAME>();
+		for (auto passive : passives) {
+			minimumPassives.setPassivePoints(passive.first, passive.second.getClass(), passive.second.getMaximumPoints());
+		}
+	}
+	else {
+		minimumPassives = calculatePassiveMinimums();
+	}
 }
 
 void BuildMaker::initSkills() {
@@ -355,14 +374,6 @@ void BuildMaker::addItemCandidate(Item item) {
 	}	
 }
 
-unsigned int BuildMaker::totalAbsoluteMinimum() {
-	unsigned int result = 0;
-	for (auto passive : passives) {
-		result += passive.second.getAbsoluteMinimum();
-	}
-	return result;
-}
-
 double BuildMaker::calculateDps() {
 	return calculateDpsIf(currentItemSet);
 }
@@ -404,10 +415,11 @@ double BuildMaker::calculateDpsIf(PassiveCombination<SKILL_PASSIVE_NAME> ifSkill
 }
 
 double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
-	currentStats.clear();
+	std::map<STAT_NAME, std::vector<std::pair<std::string, double>>> currentStats;
 	// PASSIVES
 	{
-		for (auto passive : ifPassives.getPassives()) {
+		auto allPassives = ifPassives.getPassives();
+		for (auto passive : allPassives) {
 			if (passive.first == PURSUIT)
 				int fdsf = 1;
 			Passive<PASSIVE_NAME>& passiveDefinition = passives.at(passive.first);
@@ -429,6 +441,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	}
 	// SKILLS
 	{
+		auto allSkills = currentSkills.getPassives();
 		for (auto skillPassive : currentSkills.getPassives()) {
 			auto skillDefinition = skills.at(skillPassive.first);
 			auto stats = skillDefinition.getStats(skillPassive.second);
@@ -449,7 +462,8 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	}
 	// ITEMS
 	{
-		for (auto item : currentItemSet.getAllItems()) {
+		auto allItems = currentItemSet.getAllItems();
+		for (auto item : allItems) {
 			auto stats = item.getStats();
 			for (auto stat : stats) {
 				if (verbose >= 2) std::cout << item.getName() << ": " << STRINGS::STAT_NAME_MAP.at(stat.first) << " = " << stat.second << std::endl;
@@ -468,37 +482,37 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	}
 	if (verbose==2) std::cout << "==================================== CALCULATING DAMAGE ====================================" << std::endl;
 	{
-		double allStats = statSum(ALL_ATRIBUTES);
+		double allStats = statSum(currentStats, ALL_ATRIBUTES);
 		if (verbose >= 2) std::cout << "ALL ATTRIBUTES: " << allStats << std::endl << std::endl;
-		double dex = statSum(DEXTERITY) + allStats;
+		double dex = statSum(currentStats, DEXTERITY) + allStats;
 		if (verbose >= 2) std::cout << "DEXTERITY: " << dex << std::endl << std::endl;
 
-		double damageRatio = statSum(DAMAGE_STAT_RATIO) / 100;
+		double damageRatio = statSum(currentStats, DAMAGE_STAT_RATIO) / 100;
 		if (verbose >= 2) std::cout << "SHARED DAMAGE RATIO: " << (damageRatio * 100) << "%" << std::endl;
-		double flatPhys = statSum(FLAT_MINION_PHYSICAL_DAMAGE) + statSum(FLAT_PHYSICAL_DAMAGE) * damageRatio;
+		double flatPhys = statSum(currentStats, FLAT_MINION_PHYSICAL_DAMAGE) + statSum(currentStats, FLAT_PHYSICAL_DAMAGE) * damageRatio;
 		flatPhys *= 2;
 		if (verbose >= 2) std::cout << "FLAT PHYSICAL DAMAGE: " << flatPhys << std::endl;
-		double flatCold = (dex * statSum(FLAT_COLD_PER_DEX)) * damageRatio;
+		double flatCold = (dex * statSum(currentStats, FLAT_COLD_PER_DEX)) * damageRatio;
 		flatCold *= 2;
 		if (verbose >= 2) std::cout << "FLAT COLD DAMAGE: " << flatCold << std::endl;
-		double flatLight = statSum(FLAT_LIGHTNING_DAMAGE) * damageRatio;
+		double flatLight = statSum(currentStats, FLAT_LIGHTNING_DAMAGE) * damageRatio;
 		flatLight *= 2;
 		if (verbose >= 2) std::cout << "FLAT LIGHTNING DAMAGE: " << flatLight << std::endl << std::endl;
 
-		double addedflatPhysFalcon = statSum(FLAT_MINION_PHYSICAL_DAMAGE_FALCON);
+		double addedflatPhysFalcon = statSum(currentStats, FLAT_MINION_PHYSICAL_DAMAGE_FALCON);
 		if (verbose >= 2) std::cout << "ADDED FLAT PHYSICAL DAMAGE FALCON: " << addedflatPhysFalcon << std::endl;
 		double flatPhysFalcon = 30 + addedflatPhysFalcon * 1.5;
 		if (verbose >= 2) std::cout << "ATTACK FLAT PHYSICAL DAMAGE FALCON: " << flatPhysFalcon << std::endl;
 		double flatPhysDiveBomb = 170 + addedflatPhysFalcon * 8.5 + 80 + addedflatPhysFalcon * 4; // + feather
 		if (verbose >= 2) std::cout << "DIVE BOMB PHYSICAL DAMAGE FALCON: " << flatPhysDiveBomb << std::endl << std::endl;
 
-		double increasedAttackSpeed1 = statSum(INCREASED_ATTACK_SPEED);
+		double increasedAttackSpeed1 = statSum(currentStats, INCREASED_ATTACK_SPEED);
 		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED FROM ITEMS: " << increasedAttackSpeed1 << std::endl;
-		double increasedAttackSpeed2 = statSum(INCREASED_ATTACK_SPEED_PER_DEXTERITY) * dex;
+		double increasedAttackSpeed2 = statSum(currentStats, INCREASED_ATTACK_SPEED_PER_DEXTERITY) * dex;
 		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED FROM DEXTERITY: " << increasedAttackSpeed2 << std::endl;
 		double increasedAttackSpeed = increasedAttackSpeed1 + increasedAttackSpeed2;
 		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED: " << increasedAttackSpeed << std::endl;
-		double moreAttackSpeed = statProduct(MORE_ATTACK_SPEED);
+		double moreAttackSpeed = statProduct(currentStats, MORE_ATTACK_SPEED);
 		if (verbose >= 2) std::cout << "MORE ATTACK SPEED: " << moreAttackSpeed << "%" << std::endl;
 		double hitsPerSecond = 6 * 0.717 * (100 + increasedAttackSpeed) / 100 * (100 + moreAttackSpeed) / 100;
 		if (verbose >= 2) std::cout << "BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
@@ -509,53 +523,58 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (!stacks) hitsPerSecondFalcon = 0;
 		if (!stacks) hitsPerSecondDiveBomb = 0;
 
-		double increasedDamagePerDex = dex * statSum(INCREASED_MINION_DAMAGE_PER_DEXTERITY);
+		double increasedDamagePerDex = dex * statSum(currentStats, INCREASED_MINION_DAMAGE_PER_DEXTERITY);
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE PER DEXTERITY: " << increasedDamagePerDex << std::endl;
-		double increasedDamagePerMs = statSum(INCREASED_MOVEMENT_SPEED) * statSum(INCREASED_DAMAGE_PER_MOVEMENT_SPEED);
+		double increasedDamagePerMs = statSum(currentStats, INCREASED_MOVEMENT_SPEED) * statSum(currentStats, INCREASED_DAMAGE_PER_MOVEMENT_SPEED);
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE PER MOVEMENT SPEED: " << increasedDamagePerMs << std::endl;
-		double increasedDamage = statSum(INCREASED_MINION_DAMAGE) + (statSum(INCREASED_DAMAGE) + increasedDamagePerMs) * damageRatio + increasedDamagePerDex;
+		double increasedDamage = statSum(currentStats, INCREASED_MINION_DAMAGE) + (statSum(currentStats, INCREASED_DAMAGE) + increasedDamagePerMs) * damageRatio + increasedDamagePerDex;
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE: " << increasedDamage << std::endl;
-		double increasedDamageFalcon = statSum(INCREASED_MINION_DAMAGE) + (statSum(INCREASED_DAMAGE) + increasedDamagePerMs) * 0.75 + increasedDamagePerDex;
+		double increasedDamageFalcon = statSum(currentStats, INCREASED_MINION_DAMAGE) + (statSum(currentStats, INCREASED_DAMAGE) + increasedDamagePerMs) * 0.75 + increasedDamagePerDex;
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE FALCON: " << increasedDamageFalcon << std::endl;
-		double increasedMinionPhys = statSum(INCREASED_MINION_PHYSICAL_DAMAGE) + statSum(INCREASED_PHYSICAL_DAMAGE) * damageRatio / 100;
+		double increasedMinionPhys = statSum(currentStats, INCREASED_MINION_PHYSICAL_DAMAGE) + statSum(currentStats, INCREASED_PHYSICAL_DAMAGE) * damageRatio / 100;
 		if (verbose >= 2) std::cout << "INCREASED MINION PHYSICAL DAMAGE: " << increasedMinionPhys << std::endl;
-		double increasedCold = statSum(INCREASED_COLD_DAMAGE) * damageRatio / 100;
+		double increasedCold = statSum(currentStats, INCREASED_COLD_DAMAGE) * damageRatio / 100;
 		if (verbose >= 2) std::cout << "INCREASED COLD DAMAGE: " << increasedCold << std::endl;
-		double intelligence = statSum(INTELLIGENCE) + allStats;
+		double intelligence = statSum(currentStats, INTELLIGENCE) + allStats;
 		if (verbose >= 2) std::cout << "INTELLIGENCE: " << intelligence << std::endl;
-		double moreDamage = (100 + statProduct(MORE_DAMAGE)) / 100 * (100 + intelligence * statSum(MORE_DAMAGE_PER_INTELLIGENCE));
+		double moreDamage = (100 + statProduct(currentStats, MORE_DAMAGE)) / 100 * (100 + intelligence * statSum(currentStats, MORE_DAMAGE_PER_INTELLIGENCE));
 		if (verbose >= 2) std::cout << "MORE DAMAGE: " << moreDamage << "%" << std::endl;
 		double moreDamageFalcon = (1.75 * 2 * (dex + 100) / 100 * 1.15 * 1.1) * 100;
 		if (verbose >= 2) std::cout << "MORE DAMAGE FALCON: " << moreDamageFalcon << "%" << std::endl << std::endl;
 		double moreDamageDiveBomb = ((moreDamageFalcon + 100) / 100 * (1 + 0.04 * 4) * (1 + 0.04 * 4)) * 100;
 		if (verbose >= 2) std::cout << "MORE DAMAGE DIVE BOMB: " << moreDamageDiveBomb << "%" << std::endl << std::endl;
 
-		double ailmentRatio = statSum(AILMENT_STAT_RATIO) / 100;
+		double ailmentRatio = statSum(currentStats, AILMENT_STAT_RATIO) / 100;
 		if (verbose >= 2) std::cout << "SHARED AILMENTS RATIO: " << (ailmentRatio * 100) << "%" << std::endl;
 		double averageStacks = 4 * (ailmentRatio * hitsPerSecond + 2 * hitsPerSecondFalcon) / 100;
 		if (!stacks) averageStacks = 0;
 		if (verbose >= 2) std::cout << "AVERAGE AILMENT STACKS FOR 1% chance: " << averageStacks << std::endl;
-		double critVulnerabilityChance = statSum(CRITICAL_VULNERABILITY_CHANCE);
-		if (verbose >= 2) std::cout << "CHANCE TO APPLY CRIT VULNERABILITY: " << critVulnerabilityChance << "%" << std::endl;
-		double averageCritVulnerabilityStacks = std::min<double>(10, averageStacks * critVulnerabilityChance + hitsPerSecondDiveBomb * 4 * 3);
-		if (verbose >= 2) std::cout << "AVERAGE CRIT VULNERABILITY STACKS: " << averageCritVulnerabilityStacks << std::endl;
-		double physShredChance = statSum(CHANCE_TO_SHRED_PHYS_RES);
+		
+		double averageCritVulnerabilityStacks = 0;
+		if (!disableCriticalVulnerability) {
+			double critVulnerabilityChance = statSum(currentStats, CRITICAL_VULNERABILITY_CHANCE);
+			if (verbose >= 2) std::cout << "CHANCE TO APPLY CRIT VULNERABILITY: " << critVulnerabilityChance << "%" << std::endl;
+			averageCritVulnerabilityStacks = std::min<double>(10, averageStacks * critVulnerabilityChance + hitsPerSecondDiveBomb * 4 * 3);
+			if (verbose >= 2) std::cout << "AVERAGE CRIT VULNERABILITY STACKS: " << averageCritVulnerabilityStacks << std::endl;
+		}
+		
+		double physShredChance = statSum(currentStats, CHANCE_TO_SHRED_PHYS_RES);
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED PHYSICAL RESISTANCE: " << physShredChance << "%" << std::endl;
 		double averagePhysShredStacks = std::min<double>(10, averageStacks * physShredChance + hitsPerSecondDiveBomb * 4 * 5);
 		if (verbose >= 2) std::cout << "AVERAGE PHYSICAL SHRED STACKS: " << averagePhysShredStacks << std::endl;
-		double physPen = statSum(PHYSICAL_PENETRATION) + averagePhysShredStacks * 2;
+		double physPen = statSum(currentStats, PHYSICAL_PENETRATION) + averagePhysShredStacks * 2;
 		if (verbose >= 2) std::cout << "TOTAL PHYSICAL PENETRATION: " << physPen << "%" << std::endl;
-		double lightShredChance = statSum(CHANCE_TO_SHRED_LIGHTNING_RES);
+		double lightShredChance = statSum(currentStats, CHANCE_TO_SHRED_LIGHTNING_RES);
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED LIGHTNING RESISTANCE: " << lightShredChance << "%" << std::endl;
 		double averageLightShredStacks = std::min<double>(10, averageStacks * lightShredChance);
 		if (verbose >= 2) std::cout << "AVERAGE LIGHTNING SHRED STACKS: " << averageLightShredStacks << std::endl;
-		double shockChance = statSum(SHOCK_CHANCE);
+		double shockChance = statSum(currentStats, SHOCK_CHANCE);
 		if (verbose >= 2) std::cout << "CHANCE TO SHOCK: " << shockChance << "%" << std::endl;
 		double averageShockStacks = std::min<double>(10, averageStacks * shockChance);
 		if (verbose >= 2) std::cout << "AVERAGE SHOCK STACKS: " << averageShockStacks << std::endl;
-		double armourShredChance = statSum(ARMOUR_SHRED_CHANCE);
+		double armourShredChance = statSum(currentStats, ARMOUR_SHRED_CHANCE);
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED ARMOUR: " << armourShredChance << "%" << std::endl;
-		double armourShredEffect = statSum(ARMOUR_SHRED_EFFECT);
+		double armourShredEffect = statSum(currentStats, ARMOUR_SHRED_EFFECT);
 		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
 		double averageArmourShred = 4 * (ailmentRatio * hitsPerSecond * (100 + armourShredEffect) / 100 + 2 * hitsPerSecondFalcon) * (armourShredChance + hitsPerSecondDiveBomb * 2);
 		if (!stacks) averageArmourShred = 0;
@@ -566,33 +585,34 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double otherArmorShredMore = physArmorShredMore * 0.7;
 		if (verbose >= 2) std::cout << "AVERAGE MORE OTHER DAMAGE FROM ARMOUR SHRED: " << otherArmorShredMore << "%" << std::endl << std::endl;
 
-		double critRatio = statSum(CRITICAL_STAT_RATIO) / 100;
+		double critRatio = statSum(currentStats, CRITICAL_STAT_RATIO) / 100;
 		if (verbose >= 2) std::cout << "SHARED CRIT RATIO: " << (critRatio * 100) << "%" << std::endl;
-		double baseCritMinion = statSum(BASE_MINION_CRITICAL_STRIKE_CHANCE);
+		double baseCritMinion = statSum(currentStats, BASE_MINION_CRITICAL_STRIKE_CHANCE);
 		if (verbose >= 2) std::cout << "BASE MINION CRIT: " << baseCritMinion << "%" << std::endl;
-		double baseCritOwn = statSum(BASE_CRITICAL_STRIKE_CHANCE);
+		double baseCritOwn = statSum(currentStats, BASE_CRITICAL_STRIKE_CHANCE);
 		if (verbose >= 2) std::cout << "BASE OWN CRIT: " << baseCritOwn << "%" << std::endl;
 		double baseCrit = baseCritMinion + baseCritOwn * critRatio;
 		if (verbose >= 2) std::cout << "BASE CRIT: " << baseCrit << "%" << std::endl;
-		double increasedCritChanceOwn = statSum(INCREASED_CRITICAL_STRIKE_CHANCE);
+		double increasedCritChanceOwn = statSum(currentStats, INCREASED_CRITICAL_STRIKE_CHANCE);
 		if (verbose >= 2) std::cout << "INCREASED CRIT CHANCE OWN: " << increasedCritChanceOwn << "%" << std::endl;
-		double increasedCritChanceMinions = statSum(INCREASED_MINION_CRITICAL_STRIKE_CHANCE);
+		double increasedCritChanceMinions = statSum(currentStats, INCREASED_MINION_CRITICAL_STRIKE_CHANCE);
 		if (verbose >= 2) std::cout << "INCREASED CRIT CHANCE MINIONS: " << increasedCritChanceMinions << "%" << std::endl;
 		double increasedCritChance = increasedCritChanceOwn * critRatio + increasedCritChanceMinions;
 		if (verbose >= 2) std::cout << "INCREASED CRIT CHANCE TOTAL: " << increasedCritChance << "%" << std::endl;
 		double increasedCritChanceFalcon = increasedCritChanceOwn * 0.75 + increasedCritChanceMinions;
 		if (verbose >= 2) std::cout << "INCREASED CRIT CHANCE TOTAL FALCON: " << increasedCritChanceFalcon << "%" << std::endl;
-		double increasedCritMultiOwn = statSum(INCREASED_CRITICAL_STRIKE_MULTIPLIER);
+		double increasedCritMultiOwn = statSum(currentStats, INCREASED_CRITICAL_STRIKE_MULTIPLIER);
 		if (verbose >= 2) std::cout << "INCREASED CRIT MULTI OWN: " << increasedCritMultiOwn << "%" << std::endl;
-		double increasedCritMultiMinions = statSum(INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER);
+		double increasedCritMultiMinions = statSum(currentStats, INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER);
 		if (verbose >= 2) std::cout << "INCREASED CRIT MULTI MINIONS: " << increasedCritMultiMinions << "%" << std::endl;
-		double criticalStrikeAvoidance = statSum(CRITICAL_STRIKE_AVOIDANCE);
+		double criticalStrikeAvoidance = statSum(currentStats, CRITICAL_STRIKE_AVOIDANCE);
 		if (verbose >= 2) std::cout << "CRITICAL STRIKE AVOIDANCE: " << criticalStrikeAvoidance << "%" << std::endl;
-		double criticalStrikeAvoidanceMulti = criticalStrikeAvoidance * statSum(INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER_PER_CRITICAL_STRIKE_AVOIDANCE);
+		double criticalStrikeAvoidanceMulti = criticalStrikeAvoidance * statSum(currentStats, INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER_PER_CRITICAL_STRIKE_AVOIDANCE);
 		if (verbose >= 2) std::cout << "CRITICAL STRIKE AVOIDANCE CRIT MULTI: " << criticalStrikeAvoidanceMulti << "%" << std::endl;
 		double totalCritMulti = increasedCritMultiOwn * critRatio + increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
 		if (verbose >= 2) std::cout << "CRIT MULTI TOTAL: " << totalCritMulti << "%" << std::endl;
 		double uncappedCritChance = baseCrit * (100 + increasedCritChance) / 100 + averageCritVulnerabilityStacks * 2;
+		if (uncappedCritChance > bestCrit) bestCrit = uncappedCritChance;
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE: " << uncappedCritChance << "%" << std::endl;
 		double cappedCritChance = std::min<double>(uncappedCritChance, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE: " << (cappedCritChance * 100) << "%" << std::endl;
@@ -708,16 +728,36 @@ void BuildMaker::findBestSkills() {
 }
 
 void BuildMaker::findBestPassives() {
-	bestDpsFound = false;
-	//currentDps = calculateDpsIf(minimumPassives);
-	findBestPassives(minimumPassives, passivePoints - minimumPassives.totalPoints(), bestDps);
-	//if (verbose >= 1) std::cout << std::endl;
+	if (reversePassiveSearch) {
+		if (verbose >= 2) counter = 0;
+		auto r = findBestPassivesReverse(minimumPassives, minimumPassives.totalPoints());
+		bestDps = r.second;
+		currentDps = bestDps;
+		bestPassives = r.first;
+		bestSkills = currentSkills;
+		bestItemSet = currentItemSet;
+		
+	}
+	else {
+		bestDpsFound = false;
+		//currentDps = calculateDpsIf(minimumPassives);
+		findBestPassives(minimumPassives, passivePoints - minimumPassives.totalPoints(), bestDps);
+		//if (verbose >= 1) std::cout << std::endl;
+	}
+	//auto p = bestPassives.totalPoints();
+	//printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, bestPassives);
+	return;
+}
+
+bool compareTupleFirst(std::tuple<double, PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>> i1, std::tuple<double, PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>> i2)
+{
+	return (std::get<0>(i1) < std::get<0>(i2));
 }
 
 void BuildMaker::findBestPassives(PassiveCombination<PASSIVE_NAME>& combo, int pointsLeft, double currentDpsCopy) {
 	if (pointsLeft == 0) {
-		passiveDependencyCache.clear();
-		if (!dependencySatisfied(passives, combo, passiveDependencyCache))
+		//passiveDependencyCache.clear();
+		if (dependencySatisfied(passives, combo, passiveDependencyCache).first != DEPENDENCY_OK)
 			return;
 
 		bestDpsFound = true;
@@ -750,7 +790,7 @@ void BuildMaker::findBestPassives(PassiveCombination<PASSIVE_NAME>& combo, int p
 		if (passive.second < passives.at(passive.first).getMaximumPoints()) {
 			auto maybeCombo = combo;
 			maybeCombo.addPassivePoint(passive.first, passives.at(passive.first).getClass());
-			if (dependencySatisfied(passives, maybeCombo, passiveDependencyCache))
+			if (dependencySatisfied(passives, maybeCombo, passiveDependencyCache).first == DEPENDENCY_OK)
 				maybeNewPassiveMap.insert(std::make_pair(calculateDpsIf(maybeCombo), std::make_pair(passive.first, maybeCombo)));
 		}
 	}
@@ -764,7 +804,105 @@ void BuildMaker::findBestPassives(PassiveCombination<PASSIVE_NAME>& combo, int p
 	}
 }
 
-double BuildMaker::statSum(STAT_NAME statName) {
+std::pair<PassiveCombination<PASSIVE_NAME>, double> BuildMaker::findBestPassivesReverse(PassiveCombination<PASSIVE_NAME>& combo, int pointsAllocated, PASSIVE_NAME limit) {
+	if (pointsAllocated == passivePoints) {
+		return std::make_pair(combo, calculateDpsIf(combo));
+	}
+
+	// first try all and sort by dps
+	std::vector<std::tuple<double, PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>>> passiveDpsVector;
+
+	auto allPassives = combo.getPassives();
+#pragma omp parallel for schedule(guided) num_threads(num_threads) shared(passiveDpsVector)
+	for (int i = 0; i < allPassives.size(); ++i) {
+		auto it = allPassives.begin(); // Get iterator for element at index i
+		std::advance(it, i);     // Advance iterator to the i-th element
+
+		auto passive = *it;
+		if (limit != PASSIVE_NAME::BASE_STATS && passive.first != limit)
+			continue;
+		if (passive.second == 0 || passive.second - 1 < passives.at(passive.first).getAbsoluteMinimum())
+			continue; // can't substract
+		auto maybeCombo = combo;
+		maybeCombo.substractPassivePoint(passive.first, passives.at(passive.first).getClass());
+		auto dps = calculateDpsIf(maybeCombo);
+#pragma omp critical
+		passiveDpsVector.push_back(std::make_tuple(dps, passive.first, maybeCombo));
+	}
+/*
+	for (auto passive : allPassives) {
+		if (limit != PASSIVE_NAME::BASE_STATS && passive.first != limit)
+			continue;
+		if (passive.second == 0 || passive.second-1 < passives.at(passive.first).getAbsoluteMinimum())
+			continue; // can't substract
+		auto maybeCombo = combo;
+		maybeCombo.substractPassivePoint(passive.first, passives.at(passive.first).getClass());
+		auto t = calculateDpsIf(maybeCombo);
+		auto dps = calculateDpsIf(maybeCombo);
+		passiveDpsVector.push_back(std::make_tuple(dps, passive.first, maybeCombo));
+	}
+*/
+	std::sort(passiveDpsVector.begin(), passiveDpsVector.end(), compareTupleFirst);
+
+	if (verbose >= 2 ) for (auto it = passiveDpsVector.begin(); it != passiveDpsVector.end(); ++it) {
+	//for (auto passive : passiveDpsMap) {
+		std::cout << "pointsAllocated " << pointsAllocated << ", dps " << std::get<0>(*it)
+				<< " if passive " << STRINGS::PASSIVE_NAME_MAP.at(std::get<1>(*it)) << std::endl;
+	}
+	if (verbose >= 2) std::cout << "stack : " << counter << std::endl;
+
+	// now check every starting from the worst
+	std::map<double, std::pair<PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>>> maybeNewPassiveMap{
+		// somthing to always return, will be worse that anything
+		std::make_pair(0, std::make_pair(PASSIVE_NAME::BASE_STATS, PassiveCombination<PASSIVE_NAME>())) 
+	};
+	bool substractOk = false;
+	for (auto it = passiveDpsVector.rbegin(); it != passiveDpsVector.rend(); ++it) {
+	//for (auto passive : passiveDpsMap) {
+		if (substractOk)
+			break;
+		auto maybeCombo = combo;
+		auto points = maybeCombo.getPassivePoints(std::get<1>(*it));
+		maybeCombo.substractPassivePoint(std::get<1>(*it), passives.at(std::get<1>(*it)).getClass());
+		auto r = dependencySatisfied(passives, maybeCombo, passiveDependencyCache);
+		switch (r.first) {
+			case DEPENDENCY_OK: {
+				auto pair = findBestPassivesReverse(maybeCombo, pointsAllocated - 1);
+				if (verbose >= 2) counter++;
+				maybeNewPassiveMap.insert(std::make_pair(pair.second, std::make_pair(std::get<1>(*it), pair.first)));
+				substractOk = true;
+				if (verbose >= 2) std::cout << "pointsAllocated " << pointsAllocated
+					<< ", substracted worst passive : " << STRINGS::PASSIVE_NAME_MAP.at(std::get<1>(*it)) << std::endl;
+				break;
+			}
+			default: {
+				continue; // shikanai
+			}
+			case DEPENDENCY_PARENT: {
+				// someone blocks
+				if (passives.at(r.second).getAbsoluteMinimum()) {
+					if (verbose >= 2) std::cout << "pointsAllocated " << pointsAllocated << ", substract block : "
+						<< STRINGS::PASSIVE_NAME_MAP.at(r.second) << " blocks " << STRINGS::PASSIVE_NAME_MAP.at(std::get<1>(*it)) << std::endl;
+					continue; // shikanai
+				}
+				auto maybeCombo2 = combo;
+				maybeCombo2.substractPassivePoint(r.second, passives.at(r.second).getClass());
+				auto r1 = dependencySatisfied(passives, maybeCombo2, passiveDependencyCache);
+				if (r1.first == DEPENDENCY_OK) {
+					if (verbose >= 2) std::cout << "pointsAllocated " << pointsAllocated << ", substracted child : " << STRINGS::PASSIVE_NAME_MAP.at(r.second) << std::endl;
+					auto pair = findBestPassivesReverse(maybeCombo2, pointsAllocated - 1, std::get<1>(*it));
+					if (verbose >= 2) counter++;
+					maybeNewPassiveMap.insert(std::make_pair(pair.second, std::make_pair(std::get<1>(*it), pair.first)));
+				}
+			}
+		}
+	}
+
+	auto r = *maybeNewPassiveMap.rbegin(); // best result
+	return std::make_pair(r.second.second, r.first);
+}
+
+double BuildMaker::statSum(std::map<STAT_NAME, std::vector<std::pair<std::string, double>>>& currentStats, STAT_NAME statName) {
 	auto it = currentStats.find(statName);
 	if (it == currentStats.end()) {
 		if (verbose >= 2) std::cout << "Nothing with " << STRINGS::STAT_NAME_MAP.at(statName) << std::endl;
@@ -785,7 +923,7 @@ double BuildMaker::statSum(STAT_NAME statName) {
 	return result;
 }
 
-double BuildMaker::statProduct(STAT_NAME statName) {
+double BuildMaker::statProduct(std::map<STAT_NAME, std::vector<std::pair<std::string, double>>>& currentStats, STAT_NAME statName) {
 	auto it = currentStats.find(statName);
 	if (it == currentStats.end()) {
 		if (verbose >= 2) std::cout << "Nothing with " << STRINGS::STAT_NAME_MAP.at(statName) << std::endl;

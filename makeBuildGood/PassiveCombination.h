@@ -37,6 +37,8 @@ public:
 		}
 	}
 	void substractPassivePoint(T passiveName, PASSIVE_CLASS_NAME passiveClassName) {
+		if (passives.at(passiveName) == 0)
+			throw "no no";
 		passives.at(passiveName)--;
 		pointsCountMap.at(passiveClassName)--;
 	}
@@ -62,6 +64,14 @@ public:
 		unsigned int result = 0;
 		for (auto p : pointsCountMap) {
 			result += p.second;
+		}
+		return result;
+	}
+
+	unsigned int totalAbsoluteMinimum(std::map<T, Passive<T>>& universalPassives) {
+		unsigned int result = 0;
+		for (auto passive : passives) {
+			result += universalPassives.at(passive.first).getAbsoluteMinimum();
 		}
 		return result;
 	}
