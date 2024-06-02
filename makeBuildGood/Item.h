@@ -32,11 +32,12 @@ public:
 	void addItem(ITEM_SLOT slot, Item item) { items.at(slot).push_back(item); }
 	std::vector<Item>& getItems(ITEM_SLOT slot) { return items.at(slot); }
 	std::vector<Item> getAllItems();
+	int hasItem(ITEM_SLOT slot) { return items.at(slot).size(); }
 	Item getItem(ITEM_SLOT slot) { return items.at(slot).at(0); }
 	std::map<ITEM_SLOT, Item> getItemSet();
 	std::map<ITEM_SLOT, std::vector<Item>> getAllItemSet() { return items; }
 	void changeItem(ITEM_SLOT slot, Item item) { items.at(slot) = std::vector<Item>{ item }; }
-	bool hasEmpty();
+	void unequipItem(ITEM_SLOT slot) { items.at(slot).clear(); }
 	void clear() { for (auto itemType : items) itemType.second.clear(); }
 	std::map<STAT_NAME, std::vector<double>> getAllStats();
 

@@ -17,8 +17,136 @@ BuildMaker::BuildMaker()
 	stacks = true;
 	reversePassiveSearch = true;
 	disableCriticalVulnerability = false;
+	allowSameItems = true;
+
+	usedItemsInit = {
+		{ HELM, std::set<int>() },
+		{ AMULET, std::set<int>() },
+		{ BOW, std::set<int>() },
+		{ QUIVER, std::set<int>() },
+		{ BODY, std::set<int>() },
+		{ RING, std::set<int>() },
+		{ BELT, std::set<int>() },
+		{ GLOVES, std::set<int>() },
+		{ BOOTS, std::set<int>() },
+		{ RELIC, std::set<int>() },
+		{ BIG_IDOL, std::set<int>() },
+		{ SMALL_IDOL, std::set<int>() },
+		{ BLESSING_BLACK_SUN, std::set<int>() },
+		{ BLESSING_REIGN_OF_DRAGONS, std::set<int>() },
+		{ BLESSING_SPIRITS_OF_FIRE, std::set<int>() },
+		{ BLESSING_THE_AGE_OF_WINTER, std::set<int>() },
+		{ BLESSING_ENDING_THE_STORM, std::set<int>() },
+	};
 
 	init();
+}
+
+void BuildMaker::makeGoodBuild() {
+	using std::chrono::high_resolution_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::duration;
+	using std::chrono::milliseconds;
+	auto t1 = high_resolution_clock::now();
+
+	passivePoints = (realPassives == PassiveCombination<PASSIVE_NAME>()) ? 113 : realPassives.totalPoints();
+
+	// literally anything
+	{
+		std::cout << "Generating initial build to start with" << std::endl;
+		currentItemSet.clear();
+		/*
+		currentItemSet.addItem(HELM_SLOT, items.getItem(HELM_SLOT));
+		currentItemSet.addItem(AMULET_SLOT, items.getItem(AMULET_SLOT));
+		currentItemSet.addItem(BOW_SLOT, items.getItem(BOW_SLOT));
+		currentItemSet.addItem(QUIVER_SLOT, items.getItem(QUIVER_SLOT));
+		currentItemSet.addItem(BODY_SLOT, items.getItem(BODY_SLOT));
+		currentItemSet.addItem(RING_LEFT_SLOT, items.getItem(RING_LEFT_SLOT));
+		currentItemSet.addItem(RING_RIGHT_SLOT, items.getItem(RING_RIGHT_SLOT));
+		currentItemSet.addItem(BELT_SLOT, items.getItem(BELT_SLOT));
+		currentItemSet.addItem(GLOVES_SLOT, items.getItem(GLOVES_SLOT));
+		currentItemSet.addItem(BOOTS_SLOT, items.getItem(BOOTS_SLOT));
+		currentItemSet.addItem(RELIC_SLOT, items.getItem(RELIC_SLOT));
+		currentItemSet.addItem(BIG_IDOL_1_SLOT, items.getItem(BIG_IDOL_1_SLOT));
+		currentItemSet.addItem(BIG_IDOL_2_SLOT, items.getItem(BIG_IDOL_2_SLOT));
+		currentItemSet.addItem(BIG_IDOL_3_SLOT, items.getItem(BIG_IDOL_3_SLOT));
+		currentItemSet.addItem(BIG_IDOL_4_SLOT, items.getItem(BIG_IDOL_4_SLOT));
+		currentItemSet.addItem(SMALL_IDOL_1_SLOT, items.getItem(SMALL_IDOL_1_SLOT));
+		currentItemSet.addItem(SMALL_IDOL_2_SLOT, items.getItem(SMALL_IDOL_2_SLOT));
+		currentItemSet.addItem(SMALL_IDOL_3_SLOT, items.getItem(SMALL_IDOL_3_SLOT));
+		currentItemSet.addItem(SMALL_IDOL_4_SLOT, items.getItem(SMALL_IDOL_4_SLOT));
+		currentItemSet.addItem(BLESSING_BLACK_SUN_SLOT, items.getItem(BLESSING_BLACK_SUN_SLOT));
+		currentItemSet.addItem(BLESSING_REIGN_OF_DRAGONS_SLOT, items.getItem(BLESSING_REIGN_OF_DRAGONS_SLOT));
+		currentItemSet.addItem(BLESSING_SPIRITS_OF_FIRE_SLOT, items.getItem(BLESSING_SPIRITS_OF_FIRE_SLOT));
+		currentItemSet.addItem(BLESSING_THE_AGE_OF_WINTER_SLOT, items.getItem(BLESSING_THE_AGE_OF_WINTER_SLOT));
+		currentItemSet.addItem(BLESSING_ENDING_THE_STORM_SLOT, items.getItem(BLESSING_ENDING_THE_STORM_SLOT));
+		*/
+		bool isKestrel = currentItemSet.getAllStats().count(STAT_NAME::LEVEL_OF_BALLISTA) > 0 ? 25 : 24;
+		currentSkills = isKestrel ? *skillSetKestrel.begin() : *skillSet.begin();
+
+		bestItemSet = currentItemSet;
+		bestSkills = currentSkills;
+		bestPassives = minimumPassives;
+	}
+	double prevDps = 0;
+	//findBestPassives();
+	//findBestSkills();
+	currentDps = calculateDpsIf(currentItemSet);
+	if (verbose >= 1) std::cout << "Current DPS: " << currentDps << std::endl;
+	bestDps = currentDps;
+	int iteration = 1;
+	while (prevDps < bestDps) {
+		if (verbose >= 1) std::cout << std::endl << "=========================== FINDING BEST BUILD, iteration " << iteration++ << "===========================" << std::endl;
+		prevDps = bestDps;
+		findBestItems();
+	}
+	if (verbose >= 1) std::cout << std::endl << "NO POSSIBLE CHANGES FOR DPS INCREASE" << std::endl;
+	
+	std::cout << std::endl << "CALCULATION OF ITEM DPS CONTRIBUTION" << std::endl;
+	std::map<Item, double> dpsWithout;
+	auto bestItemSetCopy = bestItemSet;
+	for (auto item : bestItemSet.getAllItemSet()) {
+		/*if (item.first != SMALL_IDOL_1_SLOT)
+			continue;*/
+		bestItemSet = bestItemSetCopy;
+		if (!bestItemSet.hasItem(item.first))
+			continue;
+		ItemSet withoutSet;
+		withoutSet = bestItemSet;
+		Item withoutItem = withoutSet.getItem(item.first);
+		withoutSet.unequipItem(item.first);
+		currentItemSet = withoutSet;
+		dpsWithout.insert(std::make_pair(withoutItem, calculateDpsIf(bestPassives)));
+	}
+	bestItemSet = bestItemSetCopy;
+	
+	std::cout << std::endl << "BEST BUILD:" << std::endl;
+	for (auto item : bestItemSet.getAllItems()) {
+		std::cout << "+" << (bestDps / dpsWithout.at(item) - 1) * 100 << "% - " << item.toString() << std::endl;
+		//std::cout << item.toString() << std::endl;
+	}
+	std::cout << std::endl;
+	printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, bestPassives);
+	std::cout << std::endl;
+	printPassiveCombination(STRINGS::SKILL_PASSIVE_NAME_MAP, bestSkills);
+	std::cout << std::endl << "DPS: " << bestDps << std::endl;
+	std::cout << std::endl << "crit%: " << bestCrit << std::endl;
+	
+	// passive changes
+	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
+		auto realDps = calculateDpsIf(realPassives);
+		std::cout << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
+		for (auto passive : realPassives.getPassives()) {
+			if (bestPassives.getPassivePoints(passive.first) != passive.second)
+				std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << passive.second
+				<< " -> " << bestPassives.getPassivePoints(passive.first) << std::endl;
+		}
+		std::cout << std::endl;
+	}
+
+	auto t2 = high_resolution_clock::now();
+	duration<double, std::milli> ms_double = t2 - t1;
+	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
 }
 
 void BuildMaker::init() {
@@ -306,16 +434,6 @@ void BuildMaker::initSkills() {
 		initCombo.setPassivePoints(skill.first, skill.second.getClass(), skill.second.getAbsoluteMinimum());
 	}
 
-	auto shared0 = initCombo;
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); //2
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
-	skillSet.push_back(shared0);
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 0); // 0
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::LIGHT_BOLTS, PASSIVE_CLASS_NAME::BASE, 2); // 1
-	skillSet.push_back(shared0);
-	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
-	skillSetKestrel.push_back(shared0);
-
 	auto shared1 = initCombo;
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::RAPID_FIRE, PASSIVE_CLASS_NAME::BASE, 2); // 1
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
@@ -330,6 +448,16 @@ void BuildMaker::initSkills() {
 	skillSet.push_back(shared2);
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
 	skillSetKestrel.push_back(shared2);
+
+	auto shared0 = initCombo;
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); //2
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
+	skillSet.push_back(shared0);
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 0); // 0
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::LIGHT_BOLTS, PASSIVE_CLASS_NAME::BASE, 2); // 1
+	skillSet.push_back(shared0);
+	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
+	skillSetKestrel.push_back(shared0);
 }
 
 bool BuildMaker::tests() {
@@ -658,32 +786,44 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 void BuildMaker::findBestItems() {
 	double currentDpsCopy;
 	ItemSet currentItemSetCopy;
+	auto allItems = items.getAllItemSet();
+	std::map<ITEM_TYPE, std::set<int>> usedItems = usedItemsInit;
+	
 	for (auto slotItems : items.getAllItemSet()) {
-		if (slotItems.second.size() < 2)
-			continue;
-		if (verbose >= 1) std::cout << std::endl << "ANALYZING " << STRINGS::ITEM_SLOT_MAP.at(slotItems.first) << std::endl;
+		/*if (slotItems.second.size() < 2)
+			continue;*/
+
+		//if (verbose >= 2)
+		std::cout << std::endl << "ANALYZING " << STRINGS::ITEM_SLOT_MAP.at(slotItems.first) << std::endl;
 		currentDpsCopy = bestDps;
 		currentItemSetCopy = bestItemSet;
-		if (slotItems.second.size() < 2)
-			continue;
-		std::map<double, std::pair<Item, ItemSet>> maybeNewItemsMap;
-		for (auto item : slotItems.second) {
+		/*if (slotItems.second.size() < 2)
+			continue;*/
+		std::map<double, std::tuple<int, Item, ItemSet>> maybeNewItemsMap;
+		for (int i = 0; i < slotItems.second.size(); ++i) {
+			auto item = slotItems.second[i];
+			if (!allowSameItems && usedItems.at(item.getType()).count(i) > 0)
+				continue;
+		//for (auto item : slotItems.second) {
 			//std::cout << std::endl;
 			auto maybeItemSet = currentItemSetCopy;
 			maybeItemSet.changeItem(slotItems.first, item);
 			auto newDps = calculateDpsIf(maybeItemSet);
-			maybeNewItemsMap.insert(std::make_pair(newDps, std::make_pair(item, maybeItemSet)));
+			maybeNewItemsMap.insert(std::make_pair(newDps, std::make_tuple(i, item, maybeItemSet)));
 			//if (verbose >= 1) std::cout << newDps << " - " << item.toString() << std::endl;
 		}
+		if (maybeNewItemsMap.empty())
+			continue;
+
 		auto newDps = maybeNewItemsMap.rbegin()->first;
-		auto newItem = maybeNewItemsMap.rbegin()->second.first;
+		auto newItem = std::get<1>(maybeNewItemsMap.rbegin()->second);
+		usedItems.at(newItem.getType()).insert(std::get<0>(maybeNewItemsMap.rbegin()->second));
 		if (newDps > currentDpsCopy) {
 			if (verbose >= 1) {
 				std::cout << std::endl << "Changing item for more DPS " << currentDpsCopy << " -> " << newDps << " +" << (newDps / currentDpsCopy - 1) * 100 << "%: " << " " << std::endl;
-				std::cout << "from: " << currentItemSetCopy.getItem(slotItems.first).toString() << std::endl;
+				std::cout << "from: " << (currentItemSetCopy.hasItem(slotItems.first) ? currentItemSetCopy.getItem(slotItems.first).toString() : "nothing") << std::endl;
 				std::cout << "to  : " << newItem.toString() << std::endl;
 			}
-			
 		}
 		else {
 			if (verbose >= 1) {
@@ -692,7 +832,7 @@ void BuildMaker::findBestItems() {
 		}
 		bestDps = newDps;
 		currentDps = bestDps;
-		currentItemSet = maybeNewItemsMap.rbegin()->second.second;
+		currentItemSet = std::get<2>(maybeNewItemsMap.rbegin()->second);
 		bestItemSet = currentItemSet;
 	}
 	//if (verbose >= 1) std::cout << std::endl;

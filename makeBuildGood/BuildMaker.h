@@ -17,86 +17,7 @@
 class BuildMaker {
 public:
 	BuildMaker();
-	void makeGoodBuild() {
-		using std::chrono::high_resolution_clock;
-		using std::chrono::duration_cast;
-		using std::chrono::duration;
-		using std::chrono::milliseconds;
-		auto t1 = high_resolution_clock::now();
-		// control item sets
-		if (items.hasEmpty()) {
-			std::cout << "Failed to make a build" << std::endl;
-			return;
-		}
-
-		// literally anything
-		{
-			std::cout << "Generating initial build to start with" << std::endl;
-			currentItemSet.clear();
-			currentItemSet.addItem(HELM_SLOT, items.getItem(HELM_SLOT));
-			currentItemSet.addItem(AMULET_SLOT, items.getItem(AMULET_SLOT));
-			currentItemSet.addItem(BOW_SLOT, items.getItem(BOW_SLOT));
-			currentItemSet.addItem(QUIVER_SLOT, items.getItem(QUIVER_SLOT));
-			currentItemSet.addItem(BODY_SLOT, items.getItem(BODY_SLOT));
-			currentItemSet.addItem(RING_LEFT_SLOT, items.getItem(RING_LEFT_SLOT));
-			currentItemSet.addItem(RING_RIGHT_SLOT, items.getItem(RING_RIGHT_SLOT));
-			currentItemSet.addItem(BELT_SLOT, items.getItem(BELT_SLOT));
-			currentItemSet.addItem(GLOVES_SLOT, items.getItem(GLOVES_SLOT));
-			currentItemSet.addItem(BOOTS_SLOT, items.getItem(BOOTS_SLOT));
-			currentItemSet.addItem(RELIC_SLOT, items.getItem(RELIC_SLOT));
-			currentItemSet.addItem(BIG_IDOL_1_SLOT, items.getItem(BIG_IDOL_1_SLOT));
-			currentItemSet.addItem(BIG_IDOL_2_SLOT, items.getItem(BIG_IDOL_2_SLOT));
-			currentItemSet.addItem(BIG_IDOL_3_SLOT, items.getItem(BIG_IDOL_3_SLOT));
-			currentItemSet.addItem(BIG_IDOL_4_SLOT, items.getItem(BIG_IDOL_4_SLOT));
-			currentItemSet.addItem(SMALL_IDOL_1_SLOT, items.getItem(SMALL_IDOL_1_SLOT));
-			currentItemSet.addItem(SMALL_IDOL_2_SLOT, items.getItem(SMALL_IDOL_2_SLOT));
-			currentItemSet.addItem(SMALL_IDOL_3_SLOT, items.getItem(SMALL_IDOL_3_SLOT));
-			currentItemSet.addItem(SMALL_IDOL_4_SLOT, items.getItem(SMALL_IDOL_4_SLOT));
-			currentItemSet.addItem(BLESSING_BLACK_SUN_SLOT, items.getItem(BLESSING_BLACK_SUN_SLOT));
-			currentItemSet.addItem(BLESSING_REIGN_OF_DRAGONS_SLOT, items.getItem(BLESSING_REIGN_OF_DRAGONS_SLOT));
-			currentItemSet.addItem(BLESSING_SPIRITS_OF_FIRE_SLOT, items.getItem(BLESSING_SPIRITS_OF_FIRE_SLOT));
-			currentItemSet.addItem(BLESSING_THE_AGE_OF_WINTER_SLOT, items.getItem(BLESSING_THE_AGE_OF_WINTER_SLOT));
-			currentItemSet.addItem(BLESSING_ENDING_THE_STORM_SLOT, items.getItem(BLESSING_ENDING_THE_STORM_SLOT));
-			bool isKestrel = currentItemSet.getAllStats().count(STAT_NAME::LEVEL_OF_BALLISTA) > 0 ? 25 : 24;
-			currentSkills = isKestrel ? *skillSetKestrel.begin() : *skillSet.begin();
-			
-			bestItemSet = currentItemSet;
-			bestSkills = currentSkills;
-			bestPassives = minimumPassives;
-		}
-		double prevDps = 0;
-		//findBestPassives();
-		//findBestSkills();
-		currentDps = calculateDpsIf(currentItemSet);
-		if (verbose >= 1) std::cout << "Current DPS: " << currentDps << std::endl;
-		bestDps = currentDps;
-		int iteration = 1;
-		while (prevDps < bestDps) {
-			if (verbose >= 1) std::cout << "FINDING BEST BUILD, iteration " << iteration++ << std::endl;
-			prevDps = bestDps;
-			findBestItems();
-		}
-		if (verbose >= 1) std::cout << std::endl << "NOTHING BETTER FOUND!" << std::endl;
-
-		std::cout << std::endl<< "BEST BUILD:" << std::endl;
-		//verbose = 2;
-		//calculateDps();
-
-		for (auto item : bestItemSet.getAllItems()) {
-			std::cout << item.toString() << std::endl;
-		}
-		std::cout << std::endl;
-		printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, bestPassives);
-		std::cout << std::endl;
-		printPassiveCombination(STRINGS::SKILL_PASSIVE_NAME_MAP, bestSkills);
-		std::cout << std::endl << "DPS: " << bestDps << std::endl;
-		std::cout << std::endl << "crit%: " << bestCrit << std::endl;
-		auto t2 = high_resolution_clock::now();
-		duration<double, std::milli> ms_double = t2 - t1;	
-		std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl;
-		//verbose = 2;
-		//calculateDpsIf(bestPassives);
-	}
+	void makeGoodBuild();
 	bool tests();
 
 	void addItemCandidate(Item item);
@@ -104,15 +25,18 @@ public:
 	bool stacks;
 	bool reversePassiveSearch;
 	bool disableCriticalVulnerability;
+	bool allowSameItems;
+	PassiveCombination<PASSIVE_NAME> realPassives;
 private:
 	int counter;
-	const unsigned int passivePoints = 113;
+	unsigned int passivePoints;
 	const int num_threads;
 
 	std::map<PASSIVE_NAME, Passive<PASSIVE_NAME>> passives;
 	PassiveCombination<PASSIVE_NAME> bestPassives;
 	PassiveCombination<PASSIVE_NAME> minimumPassives;
 	std::map<PassiveCombination<PASSIVE_NAME>, std::pair<DEPENDENCY, PASSIVE_NAME>> passiveDependencyCache;
+	
 
 	std::map<SKILL_PASSIVE_NAME, Passive<SKILL_PASSIVE_NAME>> skills;
 	std::vector<PassiveCombination<SKILL_PASSIVE_NAME>> skillSet;
@@ -123,6 +47,7 @@ private:
 	ItemSet items;
 	ItemSet currentItemSet;
 	ItemSet bestItemSet;
+	std::map<ITEM_TYPE, std::set<int>> usedItemsInit;
 
 	double bestDps, currentDps;
 	double bestCrit;
@@ -212,8 +137,9 @@ private:
 	template <typename T>
 	void printPassiveCombination(std::map<T, std::string> universalStrings, PassiveCombination<T> combo) {
 		for (auto passive : combo.getPassives()) {
-			std::cout << universalStrings.at(passive.first) << " = " << passive.second << std::endl;
+			std::cout << universalStrings.at(passive.first) << " = " << passive.second << ", ";
 		}
+		std::cout << std::endl;
 	}
 	template <typename T>
 	std::pair<DEPENDENCY, T> dependencySatisfied(std::map<T, Passive<T>>& universalPassives, PassiveCombination<T>& combo, T passiveName) {

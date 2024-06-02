@@ -72,16 +72,6 @@ std::map<ITEM_SLOT, Item> ItemSet::getItemSet() {
 	return result;
 }
 
-bool ItemSet::hasEmpty() {
-	for (auto slot : items) {
-		if (slot.second.empty()) {
-			std::cout << STRINGS::ITEM_SLOT_MAP.at(slot.first) << " is missing from the item set, cannot make a build" << std::endl;
-			return true;
-		}
-	}
-	return false;
-}
-
 std::map<STAT_NAME, std::vector<double>> ItemSet::getAllStats() {
 	std::map<STAT_NAME, std::vector<double>> result;
 	for (auto item : items) {
