@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BUILD_MAKER
+#define BUILD_MAKER
 
 #include "enums.h"
 #include "Passive.h"
@@ -57,7 +58,8 @@ public:
 			bestPassives = minimumPassives;
 		}
 		double prevDps = 0;
-		findBestSkills();
+		//findBestPassives();
+		//findBestSkills();
 		currentDps = calculateDpsIf(currentItemSet);
 		if (verbose >= 1) std::cout << "Current DPS: " << currentDps << std::endl;
 		bestDps = currentDps;
@@ -108,6 +110,8 @@ private:
 	std::map<STAT_NAME, std::vector<std::pair<std::string, double>>> currentStats;
 	double bestDps, currentDps;
 	bool bestDpsFound;
+	std::map<ItemSet, double> dpsCacheItems;
+	std::map<std::pair<ItemSet, PassiveCombination<SKILL_PASSIVE_NAME>>, double> dpsCacheSkills;
 
 	unsigned int verbose; // 0 - minimum, 1 - normal, 2 - detailed
 
@@ -283,3 +287,5 @@ private:
 
 	int get_num_threads();
 };
+
+#endif

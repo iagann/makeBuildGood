@@ -332,6 +332,7 @@ bool BuildMaker::tests() {
 }
 
 void BuildMaker::addItemCandidate(Item item) {
+	//std::cout << item.toString() << std::endl << std::endl;
 	switch (item.getType()) {
 	case HELM: items.addItem(HELM_SLOT, item); break;
 	case AMULET: items.addItem(AMULET_SLOT, item); break;
@@ -366,21 +367,39 @@ double BuildMaker::calculateDps() {
 }
 
 double BuildMaker::calculateDpsIf(ItemSet ifItemSet) {
+	auto it = dpsCacheItems.find(ifItemSet);
+	if (it != dpsCacheItems.end()) {
+		//std::cout << "Using cached items dps" << std::endl;
+		return it->second;
+	}
+
 	currentItemSet = ifItemSet;
 	int prevVerbose = verbose;
 	//verbose = 0;
 	findBestSkills();
 	verbose = prevVerbose;
-	return calculateDpsIf(currentSkills);
+
+	auto result = calculateDpsIf(currentSkills);
+	dpsCacheItems.insert(std::make_pair(ifItemSet, result));
+	return result;
 }
 
 double BuildMaker::calculateDpsIf(PassiveCombination<SKILL_PASSIVE_NAME> ifSkills) {
+	auto it = dpsCacheSkills.find(std::make_pair(currentItemSet, ifSkills));
+	if (it != dpsCacheSkills.end()) {
+		//std::cout << "Using cached skills dps" << std::endl;
+		return it->second;
+	}
+
 	currentSkills = ifSkills;
 	int prevVerbose = verbose;
 	//verbose = 0;
 	findBestPassives();
 	verbose = prevVerbose;
-	return calculateDpsIf(bestPassives);
+
+	auto result = calculateDpsIf(bestPassives);
+	dpsCacheSkills.insert(std::make_pair(std::make_pair(currentItemSet, ifSkills), result));
+	return result;
 }
 
 double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
@@ -609,8 +628,10 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << std::setw(w1) << "PHYSICAL DPS DIVE BOMB:" << std::setw(w2) << totalHitDiveBomb * hitsPerSecondDiveBomb << std::setw(w3) << (totalHitDiveBomb * hitsPerSecondDiveBomb / dps * 100) << "%" << std::endl << std::endl;
 
 		if (verbose >= 2) std::cout << std::setw(w1) << "TOTAL DPS: " << std::setw(w2) << dps << std::endl;
+
 		return dps;
 	}
+
 }
 
 void BuildMaker::findBestItems() {
