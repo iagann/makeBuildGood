@@ -13,9 +13,9 @@ public:
 
 	Item withStat(STAT_NAME stat, double value);
 	std::vector<std::pair<STAT_NAME, double>> getStats() { return stats; }
-	const ITEM_TYPE getType() { return itemType; }
-	const std::string getName() { return name; }
-	std::string toString();
+	const ITEM_TYPE getType() const { return itemType; }
+	const std::string getName() const { return name; }
+	std::string toString() const;
 
 	bool operator<(const Item& other) const;
 	bool operator==(const Item& other) const;

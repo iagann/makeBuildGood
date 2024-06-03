@@ -104,29 +104,55 @@ void BuildMaker::makeGoodBuild() {
 	
 	std::cout << std::endl << "CALCULATION OF ITEM DPS CONTRIBUTION" << std::endl;
 	std::map<Item, double> dpsWithout;
+	std::map<Item, std::map<Item, double>> dpsCompare;
 	auto bestItemSetCopy = bestItemSet;
 	auto bestPassivesCopy = bestPassives;
+	bool wasAllowingSameItems = allowSameItems;
+	allowSameItems = true;
 	for (auto item : bestItemSet.getAllItemSet()) {
 		/*if (item.first != SMALL_IDOL_1_SLOT)
 			continue;*/
 		bestItemSet = bestItemSetCopy;
 		if (!bestItemSet.hasItem(item.first))
 			continue;
-		ItemSet withoutSet;
-		withoutSet = bestItemSet;
+		ItemSet withoutSet = bestItemSet;
 		Item withoutItem = withoutSet.getItem(item.first);
 		withoutSet.unequipItem(item.first);
 		currentItemSet = withoutSet;
-		dpsWithout.insert(std::make_pair(withoutItem, calculateDpsIf(bestPassives)));
+
+		auto dps1 = calculateDpsIf(bestPassives);
+		dpsWithout.insert(std::make_pair(withoutItem, dps1));
+
+		
+		dpsCompare.insert(std::make_pair(withoutItem, std::map<Item, double>()));
+		for (auto comparedItem : items.getItems(item.first)) {
+			if (comparedItem == withoutItem)
+				continue;
+			currentItemSet = bestItemSet;
+			auto dps = calculateDpsIf(bestPassives);
+			bestItemSet = bestItemSetCopy;
+			ItemSet comparedSet = bestItemSet;
+			comparedSet.changeItem(item.first, comparedItem);
+			currentItemSet = comparedSet;
+			auto dps2 = calculateDpsIf(bestPassives);
+			if (dps2 < dps)
+				dpsCompare.at(withoutItem).insert(std::make_pair(comparedItem, dps / dps2));
+		}
 	}
+	allowSameItems = wasAllowingSameItems;
 	currentItemSet = bestItemSetCopy;
 	//bestItemSet = bestItemSetCopy;
 	findBestPassives();
 	
 	std::cout << std::endl << "BEST BUILD:" << std::endl;
 	for (auto item : bestItemSet.getAllItems()) {
-		std::cout << "\t+" << (bestDps / dpsWithout.at(item) - 1) * 100 << "% - " << item.toString() << std::endl;
+		std::cout << item.toString() << std::endl;
+		//std::cout << "\t-" << (1 - dpsWithout.at(item) / bestDps) * 100 << "% if deequip - " << item.toString() << std::endl;
 		//std::cout << item.toString() << std::endl;
+		for (auto comparedItem : dpsCompare.at(item)) {
+			if (comparedItem.second < bestDps)
+				std::cout << "\t" << (1 - comparedItem.second) * 100 << "% if change - " << comparedItem.first.toString() << std::endl;
+		}
 	}
 
 	std::cout << std::endl;
@@ -169,8 +195,9 @@ void BuildMaker::makeGoodBuild() {
 				<< " " << STRINGS::PASSIVE_NAME_MAP.at(passive) << std::endl;
 	}
 	
+	calculateDpsIf(bestPassives);
 	std::cout << std::endl << "DPS: " << bestDps << std::endl;
-	std::cout << std::endl << "crit%: " << bestCrit << std::endl;
+	std::cout << std::endl << "crit%: " << lastCritChance << std::endl;
 	
 	// passive recommendations
 	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
@@ -495,7 +522,7 @@ void BuildMaker::initSkills() {
 	skillSet.push_back(shared2);
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
 	skillSetKestrel.push_back(shared2);
-
+	/*
 	auto shared0 = initCombo;
 	shared0.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); //2
 	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
@@ -505,6 +532,7 @@ void BuildMaker::initSkills() {
 	skillSet.push_back(shared0);
 	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
 	skillSetKestrel.push_back(shared0);
+	*/
 }
 
 bool BuildMaker::tests() {
@@ -787,11 +815,11 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double totalCritMulti = increasedCritMultiOwn * critRatio + increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
 		if (verbose >= 2) std::cout << "CRIT MULTI TOTAL: " << totalCritMulti << "%" << std::endl;
 		double uncappedCritChance = baseCrit * (100 + increasedCritChance) / 100 + averageCritVulnerabilityStacks * 2;
-		if (uncappedCritChance > bestCrit) bestCrit = uncappedCritChance;
+		lastCritChance = baseCrit * (100 + increasedCritChance) / 100;
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE: " << uncappedCritChance << "%" << std::endl;
 		double cappedCritChance = std::min<double>(uncappedCritChance, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE: " << (cappedCritChance * 100) << "%" << std::endl;
-		double effectiveCritMulti = cappedCritChance * totalCritMulti + 1 - cappedCritChance;
+		double effectiveCritMulti = cappedCritChance * totalCritMulti + 100 - 100 * (1 - cappedCritChance);
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI: " << effectiveCritMulti << "%" << std::endl;
 		double totalCritMultiFalcon = increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
 		if (verbose >= 2) std::cout << "CRIT MULTI TOTAL FALCON: " << totalCritMultiFalcon << "%" << std::endl;
@@ -799,7 +827,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE FALCON: " << uncappedCritChanceFalcon << "%" << std::endl;
 		double cappedCritChanceFalcon = std::min<double>(uncappedCritChanceFalcon, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE FALCON: " << (cappedCritChanceFalcon * 100) << "%" << std::endl;
-		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMulti + 1 - cappedCritChanceFalcon;
+		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMulti + 100 - 100 * (1 - cappedCritChanceFalcon);
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI FALCON: " << effectiveCritMulti << "%" << std::endl << std::endl;
 
 		double totalPhysHit = flatPhys * (100 + increasedDamage + increasedMinionPhys) / 100 * moreDamage / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMulti / 100);

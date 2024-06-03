@@ -2,13 +2,16 @@
 
 #include <iostream>
 
-#define PERFECT 0
+#define TEST 0
+
+#define PERFECT 1
 
 #define JULRA_STARDIAL 0
 
 void testGear() {
     BuildMaker buildMaker;
     buildMaker.stacks = true;
+    buildMaker.allowSameItems = false;
     bool peak = true;
     double rollPercent = 1;
     // HELM
@@ -131,6 +134,21 @@ void testGear() {
             .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 8)
             .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 8)
         );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::SMALL_IDOL, "Eterran")
+            .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 7)
+            .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 7)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::SMALL_IDOL, "Eterran")
+            .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 7)
+            .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 7)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::SMALL_IDOL, "Eterran")
+            .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 6)
+            .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 6)
+        );
     }
     //BLESSINGS
     {
@@ -159,10 +177,11 @@ void testGear() {
     buildMaker.makeGoodBuild();
 }
 
-
 void perfectGear() {
     BuildMaker buildMaker;
     buildMaker.stacks = true;
+    buildMaker.disableCriticalVulnerability = false;
+
     bool peak = true;
     double rollPercent = 1;
     // HELM
@@ -271,8 +290,8 @@ void perfectGear() {
     }
     // BODY
     {
-        /*
-        2.31% less
+        
+        // 2.31% less
         buildMaker.addItemCandidate(
             Item(ITEM_TYPE::BODY, "The Kestrel")
             .withStat(STAT_NAME::INCREASED_ATTACK_SPEED, 48)
@@ -280,7 +299,6 @@ void perfectGear() {
             .withStat(STAT_NAME::LEVEL_OF_BALLISTA, 1)
             .withStat(STAT_NAME::INCREASED_MOVEMENT_SPEED, 16)
         );
-        */
         /*
         3% less
         buildMaker.addItemCandidate(
@@ -290,12 +308,14 @@ void perfectGear() {
             .withStat(STAT_NAME::LEVEL_OF_BALLISTA, 1)
         );
         */
+        /*
         buildMaker.addItemCandidate(
             Item(ITEM_TYPE::BODY, "Woven Flesh")
             .withStat(STAT_NAME::INCREASED_ATTACK_SPEED, 48)
             .withStat(STAT_NAME::DEXTERITY, 12 * rollPercent)
             .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 100)
         );
+        */
     }
     // QUIVER
     {
@@ -472,6 +492,12 @@ void perfectGear() {
             .withStat(STAT_NAME::ARMOUR_SHRED_EFFECT, 86 * rollPercent)
         );
         buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::BIG_IDOL, "Adorned")
+            .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 25 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 25 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 62 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
             Item(ITEM_TYPE::SMALL_IDOL, "Eterran")
             .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 8)
             .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 8)
@@ -617,7 +643,7 @@ void realGearPassives() {
                 Item(ITEM_TYPE::BIG_IDOL, "Adorned")
                 .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 22)
                 .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 22)
-            );
+            );/*
             buildMaker.addItemCandidate(
                 Item(ITEM_TYPE::BIG_IDOL, "Adorned")
                 .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 24)
@@ -627,7 +653,7 @@ void realGearPassives() {
                 Item(ITEM_TYPE::BIG_IDOL, "Adorned")
                 .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 24)
                 .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 24)
-                .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 48)
+                //.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 48)
             );
             buildMaker.addItemCandidate(
                 Item(ITEM_TYPE::BIG_IDOL, "Adorned")
@@ -639,7 +665,7 @@ void realGearPassives() {
                 Item(ITEM_TYPE::BIG_IDOL, "Adorned")
                 .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 10)
                 .withStat(STAT_NAME::ARMOUR_SHRED_EFFECT, 86)
-            );
+            );*/
             buildMaker.addItemCandidate(
                 Item(ITEM_TYPE::SMALL_IDOL, "Eterran")
                 .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 8)
@@ -729,8 +755,10 @@ void realGearPassives() {
 
 int main()
 {
-    //testGear();
-    //return 0;
+    if (TEST) {
+        testGear();
+        return 0;
+    }
 
     if (PERFECT)
         perfectGear();

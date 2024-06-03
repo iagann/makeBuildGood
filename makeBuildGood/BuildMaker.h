@@ -50,7 +50,7 @@ private:
 	std::map<ITEM_TYPE, std::set<int>> usedItemsInit;
 
 	double bestDps, currentDps;
-	double bestCrit;
+	double lastCritChance;
 	bool bestDpsFound;
 	std::map<ItemSet, double> dpsCacheItems;
 	std::map<std::pair<ItemSet, PassiveCombination<SKILL_PASSIVE_NAME>>, double> dpsCacheSkills;

@@ -8,7 +8,7 @@ Item Item::withStat(STAT_NAME stat, double value) {
 	return *this;
 }
 
-std::string Item::toString() {
+std::string Item::toString() const {
 	std::stringstream ss;
 	ss << getName() << " (" << STRINGS::ITEM_TYPE_MAP.at(getType()) << "): ";
 	bool first = true;
