@@ -105,6 +105,7 @@ void BuildMaker::makeGoodBuild() {
 	std::cout << std::endl << "CALCULATION OF ITEM DPS CONTRIBUTION" << std::endl;
 	std::map<Item, double> dpsWithout;
 	auto bestItemSetCopy = bestItemSet;
+	auto bestPassivesCopy = bestPassives;
 	for (auto item : bestItemSet.getAllItemSet()) {
 		/*if (item.first != SMALL_IDOL_1_SLOT)
 			continue;*/
@@ -118,21 +119,60 @@ void BuildMaker::makeGoodBuild() {
 		currentItemSet = withoutSet;
 		dpsWithout.insert(std::make_pair(withoutItem, calculateDpsIf(bestPassives)));
 	}
-	bestItemSet = bestItemSetCopy;
+	currentItemSet = bestItemSetCopy;
+	//bestItemSet = bestItemSetCopy;
+	findBestPassives();
 	
 	std::cout << std::endl << "BEST BUILD:" << std::endl;
 	for (auto item : bestItemSet.getAllItems()) {
-		std::cout << "+" << (bestDps / dpsWithout.at(item) - 1) * 100 << "% - " << item.toString() << std::endl;
+		std::cout << "\t+" << (bestDps / dpsWithout.at(item) - 1) * 100 << "% - " << item.toString() << std::endl;
 		//std::cout << item.toString() << std::endl;
 	}
-	std::cout << std::endl;
-	printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, bestPassives);
+
 	std::cout << std::endl;
 	printPassiveCombination(STRINGS::SKILL_PASSIVE_NAME_MAP, bestSkills);
+
+	std::cout << std::endl;
+	printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, bestPassives);
+	std::cout << "If passive would change: " << std::endl;
+	const auto allPassives = bestPassives.getPassives();
+	std::vector<std::tuple<double, PASSIVE_NAME, bool>> passiveChanges;
+	for (const auto& passive : allPassives) {
+		PassiveCombination<PASSIVE_NAME> changedPassive;
+		changedPassive = bestPassives;
+		if (passive.second > passives.at(passive.first).getAbsoluteMinimum()) {
+			changedPassive.substractPassivePoint(passive.first, passives.at(passive.first).getClass());
+			auto dps = calculateDpsIf(changedPassive);
+			if (dps != bestDps)
+				passiveChanges.push_back(std::make_tuple(dps, passive.first, false));
+		}
+		if (passive.second < passives.at(passive.first).getMaximumPoints()) {
+			changedPassive.addPassivePoint(passive.first, passives.at(passive.first).getClass());
+			auto dps = calculateDpsIf(changedPassive);
+			if (dps != bestDps)
+				passiveChanges.push_back(std::make_tuple(dps, passive.first, true));
+		}
+	}
+	std::sort(passiveChanges.begin(), passiveChanges.end(), [](const auto& a, const auto& b) { return std::get<0>(a) < std::get<0>(b); });
+	for (const auto& passiveChange : passiveChanges) {
+		auto dps = std::get<0>(passiveChange);
+		auto passive = std::get<1>(passiveChange);
+		auto passiveCount = allPassives.at(passive);
+		auto added = std::get<2>(passiveChange);
+		if (added)
+			std::cout << "\t+" << (dps / bestDps  - 1) * 100 << "% - "
+				<< passiveCount << " -> " << (passiveCount + 1)
+				<< " " << STRINGS::PASSIVE_NAME_MAP.at(passive) << std::endl;
+		else
+			std::cout << "\t-" << (bestDps / dps - 1) * 100 << "% - "
+				<< passiveCount << " -> " << (passiveCount - 1)
+				<< " " << STRINGS::PASSIVE_NAME_MAP.at(passive) << std::endl;
+	}
+	
 	std::cout << std::endl << "DPS: " << bestDps << std::endl;
 	std::cout << std::endl << "crit%: " << bestCrit << std::endl;
 	
-	// passive changes
+	// passive recommendations
 	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
 		auto realDps = calculateDpsIf(realPassives);
 		std::cout << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
@@ -147,6 +187,13 @@ void BuildMaker::makeGoodBuild() {
 	auto t2 = high_resolution_clock::now();
 	duration<double, std::milli> ms_double = t2 - t1;
 	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
+
+	std::cout << "Press any key to show detailed DPS calculation" << std::endl;
+	system("pause");
+
+	findBestPassives();
+	verbose = 2;
+	calculateDpsIf(bestPassives);
 }
 
 void BuildMaker::init() {
@@ -777,6 +824,8 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << std::setw(w1) << "PHYSICAL DPS DIVE BOMB:" << std::setw(w2) << totalHitDiveBomb * hitsPerSecondDiveBomb << std::setw(w3) << (totalHitDiveBomb * hitsPerSecondDiveBomb / dps * 100) << "%" << std::endl << std::endl;
 
 		if (verbose >= 2) std::cout << std::setw(w1) << "TOTAL DPS: " << std::setw(w2) << dps << std::endl;
+		if (verbose >= 2) std::cout << std::setw(w1) << "VULNI CRIT: " << std::setw(w2) << uncappedCritChance << "%" << std::endl;
+		if (verbose >= 2) std::cout << std::setw(w1) << "NO VULNI CRIT: " << std::setw(w2) << baseCrit * (100 + increasedCritChance) / 100 << "%" << std::endl;
 
 		return dps;
 	}
@@ -889,11 +938,6 @@ void BuildMaker::findBestPassives() {
 	return;
 }
 
-bool compareTupleFirst(std::tuple<double, PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>> i1, std::tuple<double, PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>> i2)
-{
-	return (std::get<0>(i1) < std::get<0>(i2));
-}
-
 void BuildMaker::findBestPassives(PassiveCombination<PASSIVE_NAME>& combo, int pointsLeft, double currentDpsCopy) {
 	if (pointsLeft == 0) {
 		//passiveDependencyCache.clear();
@@ -982,7 +1026,7 @@ std::pair<PassiveCombination<PASSIVE_NAME>, double> BuildMaker::findBestPassives
 		passiveDpsVector.push_back(std::make_tuple(dps, passive.first, maybeCombo));
 	}
 */
-	std::sort(passiveDpsVector.begin(), passiveDpsVector.end(), compareTupleFirst);
+	std::sort(passiveDpsVector.begin(), passiveDpsVector.end(), [](const auto& a, const auto& b) { return std::get<0>(a) < std::get<0>(b); });
 
 	if (verbose >= 2 ) for (auto it = passiveDpsVector.begin(); it != passiveDpsVector.end(); ++it) {
 	//for (auto passive : passiveDpsMap) {

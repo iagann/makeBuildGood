@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#define PERFECT 1
+#define PERFECT 0
 
 #define JULRA_STARDIAL 0
 

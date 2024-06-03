@@ -24,6 +24,7 @@ private:
 	ITEM_TYPE itemType;
 	std::string name;
 	std::vector<std::pair<STAT_NAME, double>> stats;
+	bool changable;
 };
 
 class ItemSet {
