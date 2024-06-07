@@ -779,8 +779,10 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED ARMOUR: " << armourShredChance << "%" << std::endl;
 		double armourShredEffect = statSum(currentStats, ARMOUR_SHRED_EFFECT);
 		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
-		double averageArmourShred = 4 * (ailmentRatio * hitsPerSecond * (100 + armourShredEffect) / 100 + 2 * hitsPerSecondFalcon) * (armourShredChance + hitsPerSecondDiveBomb * 2);
+		double averageArmourShred = 4 * (ailmentRatio * hitsPerSecond * (100 + armourShredEffect * ailmentRatio) / 100 + 2 * hitsPerSecondFalcon) * (armourShredChance + hitsPerSecondDiveBomb * 200);
 		if (!stacks) averageArmourShred = 0;
+		double averageArmourShredStacks = 4 * (ailmentRatio * hitsPerSecond + 2 * hitsPerSecondFalcon) * (armourShredChance / 100 + hitsPerSecondDiveBomb * 2);
+		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS: " << averageArmourShredStacks << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED: " << averageArmourShred << std::endl;
 		double physArmorShredMore = 100 * (1.2 * averageArmourShred / (80 + 0.05 * pow(105, 2) + 1.2 * averageArmourShred) * 0.3
 			+ 0.0012 * pow(averageArmourShred, 2) / (180 * 105 + 0.0015 * pow(averageArmourShred, 2)) * 0.55);
@@ -819,16 +821,18 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE: " << uncappedCritChance << "%" << std::endl;
 		double cappedCritChance = std::min<double>(uncappedCritChance, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE: " << (cappedCritChance * 100) << "%" << std::endl;
-		double effectiveCritMulti = cappedCritChance * totalCritMulti + 100 - 100 * (1 - cappedCritChance);
+		double effectiveCritMulti = cappedCritChance * totalCritMulti + 100 - cappedCritChance;
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI: " << effectiveCritMulti << "%" << std::endl;
-		double totalCritMultiFalcon = increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
+		double totalCritMultiFalcon = increasedCritMultiOwn * 0.75 + increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
 		if (verbose >= 2) std::cout << "CRIT MULTI TOTAL FALCON: " << totalCritMultiFalcon << "%" << std::endl;
-		double uncappedCritChanceFalcon = baseCrit * (100 + increasedCritChanceFalcon) / 100 + averageCritVulnerabilityStacks * 2;
+		double uncappedCritChanceFalcon = (baseCritMinion * (100 + increasedCritChanceFalcon) / 100
+			+ baseCritOwn * 0.75 * (100 + increasedCritChanceOwn) / 100)
+			+ averageCritVulnerabilityStacks * 2;
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE FALCON: " << uncappedCritChanceFalcon << "%" << std::endl;
 		double cappedCritChanceFalcon = std::min<double>(uncappedCritChanceFalcon, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE FALCON: " << (cappedCritChanceFalcon * 100) << "%" << std::endl;
-		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMulti + 100 - 100 * (1 - cappedCritChanceFalcon);
-		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI FALCON: " << effectiveCritMulti << "%" << std::endl << std::endl;
+		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMultiFalcon + 100 - cappedCritChanceFalcon;
+		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI FALCON: " << effectiveCritMultiFalcon << "%" << std::endl << std::endl;
 
 		double totalPhysHit = flatPhys * (100 + increasedDamage + increasedMinionPhys) / 100 * moreDamage / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMulti / 100);
 		double totalColdHit = flatCold * (100 + increasedDamage + increasedCold * damageRatio) / 100 * moreDamage / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);

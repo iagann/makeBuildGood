@@ -180,7 +180,7 @@ void testGear() {
 void perfectGear() {
     BuildMaker buildMaker;
     buildMaker.stacks = true;
-    buildMaker.disableCriticalVulnerability = false;
+    buildMaker.disableCriticalVulnerability = true;
 
     bool peak = true;
     double rollPercent = 1;
@@ -466,6 +466,17 @@ void perfectGear() {
             .withStat(STAT_NAME::BASE_MINION_CRITICAL_STRIKE_CHANCE, 3)
             .withStat(STAT_NAME::DEXTERITY, 8)
         );
+        /*
+        // a bit less than Melvern's Writ
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RELIC, "Gambit of an Erased Rogue")
+            .withStat(STAT_NAME::INCREASED_ATTACK_SPEED, 30)
+            .withStat(STAT_NAME::DEXTERITY, 16)
+            .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 28)
+            .withStat(STAT_NAME::MORE_DAMAGE, 12)
+            .withStat(STAT_NAME::MORE_ATTACK_SPEED, -5)
+        );
+        */
     }
     //IDOLS
     {
