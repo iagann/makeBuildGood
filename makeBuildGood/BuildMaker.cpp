@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
+#include <cstdlib>
 
 #include <set>
 #include <list>
@@ -49,6 +50,13 @@ void BuildMaker::makeGoodBuild() {
 	using std::chrono::milliseconds;
 	auto t1 = high_resolution_clock::now();
 
+	if (realPassives != PassiveCombination<PASSIVE_NAME>()) {
+		for (auto passive : passives) {
+			if (passive.second.getAbsoluteMinimum() > 0 && realPassives.getPassivePoints(passive.first) < passive.second.getAbsoluteMinimum()) {
+				realPassives.setPassivePoints(passive.first, passive.second.getClass(), passive.second.getAbsoluteMinimum());
+			}
+		}
+	}
 	passivePoints = (realPassives == PassiveCombination<PASSIVE_NAME>()) ? 113 : realPassives.totalPoints();
 
 	// literally anything
@@ -200,13 +208,29 @@ void BuildMaker::makeGoodBuild() {
 	std::cout << std::endl << "crit%: " << lastCritChance << std::endl;
 	
 	// passive recommendations
+	/*std::cout << realPassives.totalPoints() << std::endl;
+	std::cout << realPassives.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;
+	std::cout << bestPassives.totalPoints() << std::endl;
+	std::cout << bestPassives.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;*/
 	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
 		auto realDps = calculateDpsIf(realPassives);
 		std::cout << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
 		for (auto passive : realPassives.getPassives()) {
-			if (bestPassives.getPassivePoints(passive.first) != passive.second)
+			if (bestPassives.getPassivePoints(passive.first) != passive.second) {
+				PassiveCombination<PASSIVE_NAME> changedPassive = realPassives;
+				changedPassive.setPassivePoints(passive.first, passives.at(passive.first).getClass(), bestPassives.getPassivePoints(passive.first));
+				auto ifDps = calculateDpsIf(changedPassive);
+				/*std::cout << changedPassive.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;
+				std::cout << ifDps << std::endl;
+				std::cout << realDps << std::endl;
+				std::cout << bestPassives.getPassivePoints(passive.first) << std::endl;
+				std::cout << passive.second << std::endl;
+				std::cout << ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << std::endl;*/
 				std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << passive.second
-				<< " -> " << bestPassives.getPassivePoints(passive.first) << std::endl;
+					<< " -> " << bestPassives.getPassivePoints(passive.first)
+					<< ", " << 100*(ifDps-realDps)/realDps/((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << "% dps per point"
+					<< std::endl;
+			}
 		}
 		std::cout << std::endl;
 	}

@@ -4,7 +4,7 @@
 
 #define TEST 0
 
-#define PERFECT 1
+#define PERFECT 0
 
 #define JULRA_STARDIAL 0
 
@@ -737,7 +737,7 @@ void realGearPassives() {
             realPassives.setPassivePoints(PASSIVE_NAME::COORDINATED_FADE, PASSIVE_CLASS_NAME::FALCONER, 1);
             realPassives.setPassivePoints(PASSIVE_NAME::INTUITIVE_CONNECTION, PASSIVE_CLASS_NAME::FALCONER, 1);
             realPassives.setPassivePoints(PASSIVE_NAME::EXPEDIENCY, PASSIVE_CLASS_NAME::FALCONER, 5);
-            realPassives.setPassivePoints(PASSIVE_NAME::TACTITIAN, PASSIVE_CLASS_NAME::FALCONER, 6);
+            realPassives.setPassivePoints(PASSIVE_NAME::TAILWIND, PASSIVE_CLASS_NAME::FALCONER, 6);
         }
         // BASE
         realPassives.setPassivePoints(PASSIVE_NAME::SWIFT_ASSASSIN, PASSIVE_CLASS_NAME::BASE, 5);
