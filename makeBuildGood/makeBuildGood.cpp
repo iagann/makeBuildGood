@@ -4,7 +4,7 @@
 
 #define TEST 0
 
-#define PERFECT 0
+#define PERFECT 1
 
 #define JULRA_STARDIAL 0
 
@@ -276,7 +276,7 @@ void perfectGear() {
             .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 25 * rollPercent)
         );
         */
-        buildMaker.addItemCandidate(
+        /*buildMaker.addItemCandidate(
             Item(ITEM_TYPE::BOW, "Uethrin's Stand")
             .withStat(STAT_NAME::INCREASED_DAMAGE, 105 * rollPercent)
             .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 21 * rollPercent)
@@ -286,7 +286,29 @@ void perfectGear() {
             .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 18 * rollPercent)
             .withStat(STAT_NAME::BASE_CRITICAL_STRIKE_CHANCE, 3 * rollPercent)
             .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 25 * rollPercent)
+        );*/
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::BOW, "Uethrin's Stand")
+            .withStat(STAT_NAME::FLAT_LIGHTNING_DAMAGE, 21 * rollPercent)
+            .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 21 * rollPercent)
+            .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 32)
+            .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE_FALCON, 32 * rollPercent)
+            .withStat(STAT_NAME::PHYSICAL_PENETRATION, 12 * rollPercent)
+            .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 18 * rollPercent)
+            .withStat(STAT_NAME::BASE_CRITICAL_STRIKE_CHANCE, 3 * rollPercent)
+            .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 25 * rollPercent)
         );
+        /*buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::BOW, "Uethrin's Stand")
+            .withStat(STAT_NAME::FLAT_LIGHTNING_DAMAGE, 21 * rollPercent)
+            .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 21 * rollPercent)
+            .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 17)
+            .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE_FALCON, 17 * rollPercent)
+            .withStat(STAT_NAME::PHYSICAL_PENETRATION, 22 * rollPercent)
+            .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 18 * rollPercent)
+            .withStat(STAT_NAME::BASE_CRITICAL_STRIKE_CHANCE, 3 * rollPercent)
+            .withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 25 * rollPercent)
+        );*/
     }
     // BODY
     {
@@ -412,9 +434,17 @@ void perfectGear() {
     }
     //BELT
     {
+        /*buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::BELT, "Jungle Queen's Chaps of Holding")
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 60 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 50 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 50 * rollPercent)
+            .withStat(STAT_NAME::DEXTERITY, 10 * rollPercent)
+        );*/
         buildMaker.addItemCandidate(
             Item(ITEM_TYPE::BELT, "Jungle Queen's Chaps of Holding")
             .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 60 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
             .withStat(STAT_NAME::INCREASED_PHYSICAL_DAMAGE, 50 * rollPercent)
             .withStat(STAT_NAME::INCREASED_MINION_PHYSICAL_DAMAGE, 50 * rollPercent)
             .withStat(STAT_NAME::DEXTERITY, 10 * rollPercent)

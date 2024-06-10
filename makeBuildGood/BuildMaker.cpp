@@ -531,7 +531,7 @@ void BuildMaker::initSkills() {
 	for (auto skill : skills) {
 		initCombo.setPassivePoints(skill.first, skill.second.getClass(), skill.second.getAbsoluteMinimum());
 	}
-
+	
 	auto shared1 = initCombo;
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::RAPID_FIRE, PASSIVE_CLASS_NAME::BASE, 2); // 1
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
@@ -539,13 +539,15 @@ void BuildMaker::initSkills() {
 	skillSet.push_back(shared1);
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); // 2
 	skillSetKestrel.push_back(shared1);
-
+	
+	/*
 	auto shared2 = initCombo;
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::RAPID_FIRE, PASSIVE_CLASS_NAME::BASE, 2); // 1
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 2); //2
 	skillSet.push_back(shared2);
 	shared2.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
 	skillSetKestrel.push_back(shared2);
+	*/
 	/*
 	auto shared0 = initCombo;
 	shared0.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); //2
@@ -803,10 +805,17 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED ARMOUR: " << armourShredChance << "%" << std::endl;
 		double armourShredEffect = statSum(currentStats, ARMOUR_SHRED_EFFECT);
 		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
-		double averageArmourShred = 4 * (ailmentRatio * hitsPerSecond * (100 + armourShredEffect * ailmentRatio) / 100 + 2 * hitsPerSecondFalcon) * (armourShredChance + hitsPerSecondDiveBomb * 200);
+		double averageArmourShredStacksBallista = 4 * ((ailmentRatio * hitsPerSecond * (100 + ailmentRatio) / 100) * armourShredChance) / 100;
+		double averageArmourShredStacksFalcon = 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
+		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 5);
+		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
+		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
+			+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb) * 100;
 		if (!stacks) averageArmourShred = 0;
-		double averageArmourShredStacks = 4 * (ailmentRatio * hitsPerSecond + 2 * hitsPerSecondFalcon) * (armourShredChance / 100 + hitsPerSecondDiveBomb * 2);
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS: " << averageArmourShredStacks << std::endl;
+		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM BALLISTAS: " << averageArmourShredStacksBallista << std::endl;
+		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM FALCON: " << averageArmourShredStacksFalcon << std::endl;
+		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM DIVE BOMB: " << averageArmourShredStacksDiveBomb << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED: " << averageArmourShred << std::endl;
 		double physArmorShredMore = 100 * (1.2 * averageArmourShred / (80 + 0.05 * pow(105, 2) + 1.2 * averageArmourShred) * 0.3
 			+ 0.0012 * pow(averageArmourShred, 2) / (180 * 105 + 0.0015 * pow(averageArmourShred, 2)) * 0.55);
@@ -849,8 +858,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI: " << effectiveCritMulti << "%" << std::endl;
 		double totalCritMultiFalcon = increasedCritMultiOwn * 0.75 + increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
 		if (verbose >= 2) std::cout << "CRIT MULTI TOTAL FALCON: " << totalCritMultiFalcon << "%" << std::endl;
-		double uncappedCritChanceFalcon = (baseCritMinion * (100 + increasedCritChanceFalcon) / 100
-			+ baseCritOwn * 0.75 * (100 + increasedCritChanceOwn) / 100)
+		double uncappedCritChanceFalcon = (baseCritMinion + baseCritOwn * 0.75) * (100 + increasedCritChanceFalcon + increasedCritChanceOwn * 0.75) / 100
 			+ averageCritVulnerabilityStacks * 2;
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE FALCON: " << uncappedCritChanceFalcon << "%" << std::endl;
 		double cappedCritChanceFalcon = std::min<double>(uncappedCritChanceFalcon, 100) / 100;
