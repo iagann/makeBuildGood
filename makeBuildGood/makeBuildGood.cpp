@@ -400,6 +400,15 @@ void perfectGear() {
             .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 35 * rollPercent)
             .withStat(STAT_NAME::FLAT_LIGHTNING_DAMAGE, 32 * rollPercent)
         );
+
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::QUIVER, "Sealed Exalted Skalnir Quiver")
+            .withStat(STAT_NAME::DEXTERITY, 16)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 60 * rollPercent)
+            .withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 9 * rollPercent)
+            .withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 100 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 35 * rollPercent)
+        );
     }
     // RING
     {
@@ -431,6 +440,57 @@ void perfectGear() {
                 .withStat(STAT_NAME::DEXTERITY, 16 * 3)
             );
         }
+
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RING, "Tongue of the Aberrant Seer")
+            .withStat(STAT_NAME::DEXTERITY, 16)
+            .withStat(STAT_NAME::INTELLIGENCE, 8 * rollPercent)
+            .withStat(STAT_NAME::ALL_ATRIBUTES, 3)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RING, "Tongue of the Aberrant Seer")
+            .withStat(STAT_NAME::DEXTERITY, 8)
+            .withStat(STAT_NAME::INTELLIGENCE, 16 * rollPercent)
+            .withStat(STAT_NAME::ALL_ATRIBUTES, 3)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+        );
+
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RING, "Sealed Exalted Turquoise Ring")
+            .withStat(STAT_NAME::DEXTERITY, 8)
+            .withStat(STAT_NAME::INTELLIGENCE, 16 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 39 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 35 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 35 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RING, "Sealed Exalted Turquoise Ring")
+            .withStat(STAT_NAME::DEXTERITY, 8)
+            .withStat(STAT_NAME::INTELLIGENCE, 16 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 39 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 35 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 35 * rollPercent)
+        );
+
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RING, "Exalted Turquoise Ring")
+            .withStat(STAT_NAME::DEXTERITY, 8)
+            .withStat(STAT_NAME::INTELLIGENCE, 16 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 35 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 35 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::RING, "Exalted Turquoise Ring")
+            .withStat(STAT_NAME::DEXTERITY, 8)
+            .withStat(STAT_NAME::INTELLIGENCE, 16 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 35 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 35 * rollPercent)
+        );
     }
     //BELT
     {
@@ -458,6 +518,7 @@ void perfectGear() {
             .withStat(STAT_NAME::DEXTERITY, 16)
             .withStat(STAT_NAME::ALL_ATRIBUTES, 6 * rollPercent)
         );
+
         buildMaker.addItemCandidate(
             Item(ITEM_TYPE::GLOVES, "Blood Roost")
             .withStat(STAT_NAME::INTELLIGENCE, 16)
@@ -466,9 +527,46 @@ void perfectGear() {
         );
         buildMaker.addItemCandidate(
             Item(ITEM_TYPE::GLOVES, "Blood Roost")
+            .withStat(STAT_NAME::INTELLIGENCE, 8 * rollPercent)
+            .withStat(STAT_NAME::DEXTERITY, 16)
+            .withStat(STAT_NAME::DEXTERITY, 15 * rollPercent)
+        );
+
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::GLOVES, "Sealed Exalted Solarum Bracers")
             .withStat(STAT_NAME::DEXTERITY, 16)
             .withStat(STAT_NAME::INTELLIGENCE, 8 * rollPercent)
-            .withStat(STAT_NAME::DEXTERITY, 15 * rollPercent)
+            .withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 100 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 39 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 40 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::GLOVES, "Sealed Exalted Solarum Bracers")
+            .withStat(STAT_NAME::DEXTERITY, 8 * rollPercent)
+            .withStat(STAT_NAME::INTELLIGENCE, 16)
+            .withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 100 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 39 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 40 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::GLOVES, "Sealed Exalted Ascetic Gloves")
+            .withStat(STAT_NAME::DEXTERITY, 16)
+            .withStat(STAT_NAME::INTELLIGENCE, 8 * rollPercent)
+            .withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 100 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 39 * rollPercent)
+            .withStat(STAT_NAME::COOLDOWN_RECOVERY_SPEED, 12 * rollPercent)
+        );
+        buildMaker.addItemCandidate(
+            Item(ITEM_TYPE::GLOVES, "Sealed Exalted Ascetic Gloves")
+            .withStat(STAT_NAME::DEXTERITY, 8 * rollPercent)
+            .withStat(STAT_NAME::INTELLIGENCE, 16)
+            .withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 100 * rollPercent)
+            .withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 37 * rollPercent)
+            .withStat(STAT_NAME::INCREASED_MINION_DAMAGE, 39 * rollPercent)
+            .withStat(STAT_NAME::COOLDOWN_RECOVERY_SPEED, 12 * rollPercent)
         );
     }
     //BOOTS

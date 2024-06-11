@@ -239,6 +239,8 @@ void BuildMaker::makeGoodBuild() {
 	duration<double, std::milli> ms_double = t2 - t1;
 	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
 
+	return;
+
 	std::cout << "Press any key to show detailed DPS calculation" << std::endl;
 	system("pause");
 
@@ -538,6 +540,7 @@ void BuildMaker::initSkills() {
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
 	skillSet.push_back(shared1);
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); // 2
+
 	skillSetKestrel.push_back(shared1);
 	
 	/*
@@ -747,7 +750,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
 		double hitsPerSecondFalcon = 1.257 * 1.2 * 1.16;
 		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl << std::endl;
-		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4) / 5;
+		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4 + statSum(currentStats, COOLDOWN_RECOVERY_SPEED) / 100) / 5;
 		if (verbose >= 2) std::cout << "DIVE BOMB HITS PER SECOND: " << hitsPerSecondDiveBomb << std::endl << std::endl;
 		if (!stacks) hitsPerSecondFalcon = 0;
 		if (!stacks) hitsPerSecondDiveBomb = 0;
@@ -807,7 +810,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
 		double averageArmourShredStacksBallista = 4 * ((ailmentRatio * hitsPerSecond * (100 + ailmentRatio) / 100) * armourShredChance) / 100;
 		double averageArmourShredStacksFalcon = 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
-		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 5);
+		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 4);
 		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
 		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
 			+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb) * 100;
@@ -868,7 +871,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 
 		double totalPhysHit = flatPhys * (100 + increasedDamage + increasedMinionPhys) / 100 * moreDamage / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMulti / 100);
 		double totalColdHit = flatCold * (100 + increasedDamage + increasedCold * damageRatio) / 100 * moreDamage / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
-		double totalLightHit = flatLight * (100 + increasedDamage) / 100 * moreDamage / 100 * (100 + averageLightShredStacks * 2) / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
+		double totalLightHit = flatLight * (100 + increasedDamage) / 100 * moreDamage / 100 * (100 + (averageLightShredStacks + averageShockStacks) * 2) / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
 		double totalHitFalcon = flatPhysFalcon * (100 + increasedDamageFalcon + increasedMinionPhys) / 100 * moreDamageFalcon / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMultiFalcon / 100);
 		double totalHitDiveBomb = flatPhysDiveBomb * (100 + increasedDamageFalcon + increasedMinionPhys) / 100 * moreDamageDiveBomb / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMultiFalcon / 100);
 
