@@ -162,11 +162,18 @@ enum DEPENDENCY {
 };
 
 static class STRINGS {
+private:
+	static bool inited;
 public:
+	static void init();
 	static const std::map<PASSIVE_NAME, std::string> PASSIVE_NAME_MAP;
+	static std::map< std::string, PASSIVE_NAME> PASSIVE_NAME_REVERSE_MAP;
 	static const std::map<PASSIVE_CLASS_NAME, std::string> PASSIVE_CLASS_NAME_MAP;
 	static const std::map<ITEM_TYPE, std::string> ITEM_TYPE_MAP;
+	static std::map<std::string, ITEM_TYPE> ITEM_TYPE_REVERSE_MAP;
 	static const std::map<ITEM_SLOT, std::string> ITEM_SLOT_MAP;
 	static const std::map<SKILL_PASSIVE_NAME, std::string> SKILL_PASSIVE_NAME_MAP;
+	static std::map<std::string, SKILL_PASSIVE_NAME> SKILL_PASSIVE_NAME_REVERSE_MAP;
 	static const std::map<STAT_NAME, std::string> STAT_NAME_MAP;
+	static std::map<std::string, STAT_NAME> STAT_NAME_REVERSE_MAP;
 };

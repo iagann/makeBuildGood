@@ -22,15 +22,26 @@ public:
 
 	void addItemCandidate(Item item);
 
+	void exportFile(const std::string& filename);
+	bool importFile(const std::string& filename);
+
 	bool stacks;
 	bool reversePassiveSearch;
 	bool disableCriticalVulnerability;
 	bool allowSameItems;
 	PassiveCombination<PASSIVE_NAME> realPassives;
 private:
+	enum IMPORT_STATE {
+		IMPORT_STATE_GLOBAL,
+		IMPORT_STATE_PASSIVES,
+		IMPORT_STATE_SKILLS,
+		IMPORT_STATE_ITEMS
+	};
+
 	int counter;
 	unsigned int passivePoints;
 	const int num_threads;
+	bool imported;
 
 	std::map<PASSIVE_NAME, Passive<PASSIVE_NAME>> passives;
 	PassiveCombination<PASSIVE_NAME> bestPassives;

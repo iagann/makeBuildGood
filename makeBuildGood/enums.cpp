@@ -1,5 +1,7 @@
 #include "enums.h"
 
+bool STRINGS::inited = false;
+
 const std::map<PASSIVE_NAME, std::string> STRINGS::PASSIVE_NAME_MAP = {
 	{ PASSIVE_NAME::BASE_STATS, "BASE_STATS" },
 
@@ -33,6 +35,8 @@ const std::map<PASSIVE_NAME, std::string> STRINGS::PASSIVE_NAME_MAP = {
 	{ PASSIVE_NAME::TAILWIND, "TAILWIND" },
 };
 
+std::map<std::string, PASSIVE_NAME> STRINGS::PASSIVE_NAME_REVERSE_MAP = {};
+
 const std::map<PASSIVE_CLASS_NAME, std::string> STRINGS::PASSIVE_CLASS_NAME_MAP = {
 	{ PASSIVE_CLASS_NAME::BASE, "BASE" },
 	{ PASSIVE_CLASS_NAME::BLADEDANCER, "BLADEDANCER" },
@@ -60,6 +64,7 @@ const std::map<ITEM_TYPE, std::string> STRINGS::ITEM_TYPE_MAP = {
 	{ ITEM_TYPE::BLESSING_ENDING_THE_STORM, "BLESSING_ENDING_THE_STORM" },
 };
 
+std::map<std::string, ITEM_TYPE> STRINGS::ITEM_TYPE_REVERSE_MAP = {};
 
 const std::map<ITEM_SLOT, std::string> STRINGS::ITEM_SLOT_MAP = {
 	{ HELM_SLOT, "HELM_SLOT"},
@@ -82,7 +87,6 @@ const std::map<ITEM_SLOT, std::string> STRINGS::ITEM_SLOT_MAP = {
 	{ BLESSING_ENDING_THE_STORM_SLOT, "BLESSING_ENDING_THE_STORM_SLOT"},
 };
 
-
 const std::map<SKILL_PASSIVE_NAME, std::string> STRINGS::SKILL_PASSIVE_NAME_MAP = {
 	{ SKILL_PASSIVE_NAME::BASE_SKILL, "BASE_SKILL" },
 
@@ -101,6 +105,8 @@ const std::map<SKILL_PASSIVE_NAME, std::string> STRINGS::SKILL_PASSIVE_NAME_MAP 
 	{ SKILL_PASSIVE_NAME::CARE_PACKAGE, "CARE_PACKAGE" },
 	{ SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, "ELIXIR_OF_CONSTRUCTION" },
 };
+
+std::map<std::string, SKILL_PASSIVE_NAME> STRINGS::SKILL_PASSIVE_NAME_REVERSE_MAP = {};
 
 const std::map<STAT_NAME, std::string> STRINGS::STAT_NAME_MAP = {
 	{ STAT_NAME::FLAT_PHYSICAL_DAMAGE, "FLAT_PHYSICAL_DAMAGE" },
@@ -148,3 +154,23 @@ const std::map<STAT_NAME, std::string> STRINGS::STAT_NAME_MAP = {
 	{ STAT_NAME::INCREASED_MINION_DAMAGE_PER_DEXTERITY, "INCREASED_DAMAGE_PER_DEXTERITY" },
 	{ STAT_NAME::INCREASED_ATTACK_SPEED_PER_DEXTERITY, "INCREASED_ATTACK_SPEED_PER_DEXTERITY" },
 };
+
+std::map<std::string, STAT_NAME> STRINGS::STAT_NAME_REVERSE_MAP = {};
+
+void STRINGS::init() {
+	if (inited)
+		return;
+
+	for (auto it : STRINGS::PASSIVE_NAME_MAP) {
+		PASSIVE_NAME_REVERSE_MAP.insert(std::make_pair(it.second, it.first));
+	}
+	for (auto it : STRINGS::ITEM_TYPE_MAP) {
+		ITEM_TYPE_REVERSE_MAP.insert(std::make_pair(it.second, it.first));
+	}
+	for (auto it : STRINGS::SKILL_PASSIVE_NAME_MAP) {
+		SKILL_PASSIVE_NAME_REVERSE_MAP.insert(std::make_pair(it.second, it.first));
+	}
+	for (auto it : STRINGS::STAT_NAME_MAP) {
+		STAT_NAME_REVERSE_MAP.insert(std::make_pair(it.second, it.first));
+	}
+}

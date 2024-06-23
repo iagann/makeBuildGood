@@ -27,6 +27,9 @@
     <ClCompile Include="Item.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="FileUtil.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="enums.h">
@@ -42,6 +45,9 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtil.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>

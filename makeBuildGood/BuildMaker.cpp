@@ -1,5 +1,6 @@
 #include "BuildMaker.h"
 #include "PassiveCombination.h"
+#include "FileUtil.h"
 
 #include <iostream>
 #include <iomanip>
@@ -19,6 +20,7 @@ BuildMaker::BuildMaker()
 	reversePassiveSearch = true;
 	disableCriticalVulnerability = false;
 	allowSameItems = true;
+	imported = false;
 
 	usedItemsInit = {
 		{ HELM, std::set<int>() },
@@ -60,6 +62,7 @@ void BuildMaker::makeGoodBuild() {
 	passivePoints = (realPassives == PassiveCombination<PASSIVE_NAME>()) ? 113 : realPassives.totalPoints();
 
 	// literally anything
+	if (!imported)
 	{
 		std::cout << "Generating initial build to start with" << std::endl;
 		currentItemSet.clear();
@@ -250,6 +253,7 @@ void BuildMaker::makeGoodBuild() {
 }
 
 void BuildMaker::init() {
+	STRINGS::init();
 	initPassives();
 	initSkills();
 }
@@ -562,6 +566,9 @@ void BuildMaker::initSkills() {
 	shared0.setPassivePoints(SKILL_PASSIVE_NAME::HEAVY_BOLTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
 	skillSetKestrel.push_back(shared0);
 	*/
+
+	currentSkills = *skillSetKestrel.begin();
+	bestSkills = currentSkills;
 }
 
 bool BuildMaker::tests() {
@@ -1202,4 +1209,184 @@ int BuildMaker::get_num_threads() {
 		num_threads = omp_get_num_threads();
 	}
 	return num_threads;
+}
+
+void BuildMaker::exportFile(const std::string& filename) {
+	std::stringstream ss;
+
+	ss << "allowSameItems " << allowSameItems << std::endl;
+	ss << "allowAilments " << stacks << std::endl;
+	ss << "disableCriticalVulnerability " << disableCriticalVulnerability << std::endl << std::endl;
+
+	if (realPassives != PassiveCombination<PASSIVE_NAME>()) {
+		ss << "PASSIVES" << std::endl << std::endl;
+		for (auto p : realPassives.getPassives()) {
+			ss << STRINGS::PASSIVE_NAME_MAP.at(p.first) << " " << p.second << std::endl;
+		}
+		ss << std::endl;
+	}
+
+	ss << "SKILL" << std::endl << std::endl;
+	for (auto p : currentSkills.getPassives()) {
+		ss << STRINGS::SKILL_PASSIVE_NAME_MAP.at(p.first) << " " << p.second << std::endl;
+	}
+	ss << std::endl;
+
+	ss << "ITEMS" << std::endl << std::endl;
+	auto v = items.getAllItems();
+	std::set<Item> itemsSet;
+	for (auto item : v) {
+		itemsSet.insert(item);
+	}
+
+	for (auto item : itemsSet) {
+		ss << STRINGS::ITEM_TYPE_MAP.at(item.getType()) << " " << item.getName() << std::endl;
+		for (auto stat : item.getStats()) {
+			ss << STRINGS::STAT_NAME_MAP.at(stat.first) << " " << stat.second << std::endl;
+		}
+		ss << std::endl;
+	}
+
+	FileUtil::save(filename, ss);
+}
+
+bool BuildMaker::importFile(const std::string& filename) {
+	std::vector<std::string> v;
+	FileUtil::load(filename, v);
+
+	IMPORT_STATE importState = IMPORT_STATE_GLOBAL;
+	std::vector<std::string> kv;
+	PassiveCombination<SKILL_PASSIVE_NAME> importedSkills;
+	PassiveCombination<PASSIVE_NAME> importedPassives;
+	Item item = Item(ITEM_TYPE::HELM, "empty");
+	bool validItem = false;
+	bool comment = false;
+	items.clear();
+
+	for (int n = 0; n < v.size(); ++n) {
+		const std::string& line = v[n];
+
+		if (line == "")
+			continue;
+
+		if (line == "*/") {
+			comment = false;
+			continue;
+		}
+		if (comment) {
+			continue;
+		}
+		if (line == "/*") {
+			comment = true;
+			continue;
+		}
+
+		auto separator = line.find(" ");
+		if (separator == std::string::npos) {
+			if (line == "SKILL") {
+				importState = IMPORT_STATE::IMPORT_STATE_SKILLS;
+				continue;
+			}
+			if (line == "PASSIVES") {
+				importState = IMPORT_STATE::IMPORT_STATE_PASSIVES;
+				continue;
+			}
+			
+			if (line == "ITEMS") {
+				importState = IMPORT_STATE::IMPORT_STATE_ITEMS;
+				continue;
+			}
+
+			std::cerr << "Import error: Character ' ' was not found at line: " << n + 1 << ": " << line << std::endl;
+			return false;
+		}
+		std::string key = line.substr(0, separator);
+
+		switch (importState) {
+			case IMPORT_STATE_GLOBAL: {
+				double value;
+				if (!FileUtil::parseDouble(line.substr(separator + 1), value)) {
+					std::cerr << "Import error: Could not convert '" << line.substr(separator + 1) << "' to a double at line " << n + 1 << ": " << line << std::endl;
+					return false;
+				}
+				if (key == "allowSameItems") {
+					allowSameItems = value;
+				}
+				else if (key == "allowAilments") {
+					stacks = value;
+				}
+				else if (key == "disableCriticalVulnerability") {
+					disableCriticalVulnerability = value;
+				}
+				else {
+					std::cerr << "Import error: unknown global parameter '" << key << "' at line " << n + 1 << ": " << line << std::endl;
+					return false;
+				}
+			}
+			break;
+			case IMPORT_STATE_SKILLS: {
+				int value;
+				if (!FileUtil::parseInt(line.substr(separator + 1), value)) {
+					std::cerr << "Import error: Could not convert '" << line.substr(separator + 1) << "' to int at line " << n + 1 << ": " << line << std::endl;
+					return false;
+				}
+				auto it = STRINGS::SKILL_PASSIVE_NAME_REVERSE_MAP.find(key);
+				if (it == STRINGS::SKILL_PASSIVE_NAME_REVERSE_MAP.end()) {
+					std::cerr << "Import error: Could not find skill node with name '" << key << "' at line " << n + 1 << ": " << line << std::endl;
+					return false;
+				}
+				importedSkills.setPassivePoints(it->second, PASSIVE_CLASS_NAME::BASE, value);
+			}
+			break;
+			case IMPORT_STATE_PASSIVES: {
+				int value;
+				if (!FileUtil::parseInt(line.substr(separator + 1), value)) {
+					std::cerr << "Import error: Could not convert '" << line.substr(separator + 1) << "' to int at line " << n + 1 << ": " << line << std::endl;
+					return false;
+				}
+				auto it = STRINGS::PASSIVE_NAME_REVERSE_MAP.find(key);
+				if (it == STRINGS::PASSIVE_NAME_REVERSE_MAP.end()) {
+					std::cerr << "Import error: Could not find passive skill with name '" << key << "' at line " << n + 1 << ": " << line << std::endl;
+					return false;
+				}
+				importedPassives.setPassivePoints(it->second, passives.at(it->second).getClass(), value);
+			}
+			break;
+			case IMPORT_STATE_ITEMS: {
+				auto itItem = STRINGS::ITEM_TYPE_REVERSE_MAP.find(key);
+				if (itItem != STRINGS::ITEM_TYPE_REVERSE_MAP.end()) {
+					if (validItem)
+						addItemCandidate(item);
+					item = Item(itItem->second, line.substr(separator + 1));
+					validItem = true;
+				}
+				else /* if (itSlot == STRINGS::ITEM_SLOT_REVERSE_MAP.end()) */ {
+					auto itStat = STRINGS::STAT_NAME_REVERSE_MAP.find(key);
+					if (itStat == STRINGS::STAT_NAME_REVERSE_MAP.end()) {
+						std::cerr << "Import error: Could not find item type name or stat name with name '" << key << "' at line " << n + 1 << ": " << line << std::endl;
+						return false;
+					}
+					double value;
+					if (!FileUtil::parseDouble(line.substr(separator + 1), value)) {
+						std::cerr << "Import error: Could not convert '" << line.substr(separator + 1) << "' to double at line " << n + 1 << ": " << line << std::endl;
+						return false;
+					}
+					item.withStat(itStat->second, value);
+				}
+				
+			}
+			break;
+		}
+	}
+
+	if (validItem)
+		addItemCandidate(item);
+	bestSkills = currentSkills = importedSkills;
+	if (importedPassives != PassiveCombination<PASSIVE_NAME>())
+		realPassives = importedPassives;
+
+	imported = true;
+
+	return true;
+	// insert code here
 }

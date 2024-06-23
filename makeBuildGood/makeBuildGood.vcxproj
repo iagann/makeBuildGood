@@ -130,12 +130,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="enums.cpp" />
+    <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="BuildMaker.cpp" />
     <ClCompile Include="makeBuildGood.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="enums.h" />
+    <ClInclude Include="FileUtil.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="BuildMaker.h" />
     <ClInclude Include="Passive.h" />
