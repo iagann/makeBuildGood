@@ -1268,7 +1268,7 @@ bool BuildMaker::importFile(const std::string& filename) {
 	for (int n = 0; n < v.size(); ++n) {
 		const std::string& line = v[n];
 
-		if (line == "")
+		if (line == "" || line.substr(0,2) == "//" || line.substr(0, 1) == "#")
 			continue;
 
 		if (line == "*/") {
