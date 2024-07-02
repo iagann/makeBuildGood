@@ -242,8 +242,6 @@ void BuildMaker::makeGoodBuild() {
 	duration<double, std::milli> ms_double = t2 - t1;
 	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
 
-	return;
-
 	std::cout << "Press any key to show detailed DPS calculation" << std::endl;
 	system("pause");
 
@@ -757,7 +755,8 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
 		double hitsPerSecondFalcon = 1.257 * 1.2 * 1.16;
 		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl << std::endl;
-		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4 + statSum(currentStats, COOLDOWN_RECOVERY_SPEED) / 100) / 5;
+		double cdr = statSum(currentStats, COOLDOWN_RECOVERY_SPEED);
+		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4 + cdr / 100) / 5;
 		if (verbose >= 2) std::cout << "DIVE BOMB HITS PER SECOND: " << hitsPerSecondDiveBomb << std::endl << std::endl;
 		if (!stacks) hitsPerSecondFalcon = 0;
 		if (!stacks) hitsPerSecondDiveBomb = 0;
@@ -779,7 +778,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double moreDamage = (100 + statProduct(currentStats, MORE_DAMAGE)) / 100 * (100 + intelligence * statSum(currentStats, MORE_DAMAGE_PER_INTELLIGENCE));
 		if (verbose >= 2) std::cout << "MORE DAMAGE: " << moreDamage << "%" << std::endl;
 		double moreDamageFalcon = (1.75 * 2 * (dex + 100) / 100 * 1.15 * 1.1) * 100;
-		if (verbose >= 2) std::cout << "MORE DAMAGE FALCON: " << moreDamageFalcon << "%" << std::endl << std::endl;
+		if (verbose >= 2) std::cout << "MORE DAMAGE FALCON: " << moreDamageFalcon << "%" << std::endl;
 		double moreDamageDiveBomb = ((moreDamageFalcon + 100) / 100 * (1 + 0.04 * 4) * (1 + 0.04 * 4)) * 100;
 		if (verbose >= 2) std::cout << "MORE DAMAGE DIVE BOMB: " << moreDamageDiveBomb << "%" << std::endl << std::endl;
 
@@ -819,13 +818,16 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double averageArmourShredStacksFalcon = 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
 		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 4);
 		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
+		double averageSmokeBombStacks = 4 * 8 * (4 / std::max<double>(4,  10 / (100 + cdr) * 100));
 		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
-			+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb) * 100;
+			+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb
+			+ averageSmokeBombStacks * (100 + armourShredEffect) / 100) * 100;
 		if (!stacks) averageArmourShred = 0;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS: " << averageArmourShredStacks << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM BALLISTAS: " << averageArmourShredStacksBallista << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM FALCON: " << averageArmourShredStacksFalcon << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM DIVE BOMB: " << averageArmourShredStacksDiveBomb << std::endl;
+		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM SMOKE BOMB: " << averageSmokeBombStacks << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED: " << averageArmourShred << std::endl;
 		double physArmorShredMore = 100 * (1.2 * averageArmourShred / (80 + 0.05 * pow(105, 2) + 1.2 * averageArmourShred) * 0.3
 			+ 0.0012 * pow(averageArmourShred, 2) / (180 * 105 + 0.0015 * pow(averageArmourShred, 2)) * 0.55);
