@@ -1,0 +1,1 @@
+/usr/bin/c++  -fopenmp CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o CMakeFiles/makeBuildGood.dir/enums.cpp.o CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o CMakeFiles/makeBuildGood.dir/Item.cpp.o CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o -o makeBuildGood 

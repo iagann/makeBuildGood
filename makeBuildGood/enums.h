@@ -161,7 +161,7 @@ enum DEPENDENCY {
 	DEPENDENCY_PARENT
 };
 
-static class STRINGS {
+class STRINGS {
 private:
 	static bool inited;
 public:
