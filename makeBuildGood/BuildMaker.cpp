@@ -657,8 +657,6 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	{
 		auto allPassives = ifPassives.getPassives();
 		for (auto passive : allPassives) {
-			if (passive.first == PURSUIT)
-				int fdsf = 1;
 			Passive<PASSIVE_NAME>& passiveDefinition = passives.at(passive.first);
 			auto stats = passiveDefinition.getStats(passive.second);
 			for (auto stat : stats) {
