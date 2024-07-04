@@ -1,10 +1,10 @@
 {
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
-    {
+    /*{
       "name": "rm -r build/*",
       "command": "rm -r build/*"
-    },
+    },*/
     {
       "name": "cmake -S . -B build",
       "command": "cmake -S . -B build"
