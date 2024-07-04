@@ -1,4 +1,4 @@
-# Install script for directory: /project/workspace
+# Install script for directory: /project/makeBuildGood
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/project/workspace/build/makeBuildGood/cmake_install.cmake")
+  include("/project/makeBuildGood/build/makeBuildGood/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/project/workspace/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/project/makeBuildGood/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

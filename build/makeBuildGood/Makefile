@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /project/workspace
+CMAKE_SOURCE_DIR = /project/makeBuildGood
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /project/workspace/build
+CMAKE_BINARY_DIR = /project/makeBuildGood/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /project/workspace/build && $(CMAKE_COMMAND) -E cmake_progress_start /project/workspace/build/CMakeFiles /project/workspace/build/makeBuildGood/CMakeFiles/progress.marks
-	cd /project/workspace/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /project/workspace/build/CMakeFiles 0
+	cd /project/makeBuildGood/build && $(CMAKE_COMMAND) -E cmake_progress_start /project/makeBuildGood/build/CMakeFiles /project/makeBuildGood/build/makeBuildGood/CMakeFiles/progress.marks
+	cd /project/makeBuildGood/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /project/makeBuildGood/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /project/workspace/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/clean
+	cd /project/makeBuildGood/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /project/workspace/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/preinstall
+	cd /project/makeBuildGood/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /project/workspace/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/preinstall
+	cd /project/makeBuildGood/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /project/workspace/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /project/makeBuildGood/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 makeBuildGood/CMakeFiles/makeBuildGood.dir/rule:
-	cd /project/workspace/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/CMakeFiles/makeBuildGood.dir/rule
+	cd /project/makeBuildGood/build && $(MAKE) -f CMakeFiles/Makefile2 makeBuildGood/CMakeFiles/makeBuildGood.dir/rule
 .PHONY : makeBuildGood/CMakeFiles/makeBuildGood.dir/rule
 
 # Convenience name for target.
@@ -122,7 +122,7 @@ makeBuildGood: makeBuildGood/CMakeFiles/makeBuildGood.dir/rule
 
 # fast build rule for target.
 makeBuildGood/fast:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/build
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/build
 .PHONY : makeBuildGood/fast
 
 BuildMaker.o: BuildMaker.cpp.o
@@ -131,7 +131,7 @@ BuildMaker.o: BuildMaker.cpp.o
 
 # target to build an object file
 BuildMaker.cpp.o:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o
 .PHONY : BuildMaker.cpp.o
 
 BuildMaker.i: BuildMaker.cpp.i
@@ -140,7 +140,7 @@ BuildMaker.i: BuildMaker.cpp.i
 
 # target to preprocess a source file
 BuildMaker.cpp.i:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.i
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.i
 .PHONY : BuildMaker.cpp.i
 
 BuildMaker.s: BuildMaker.cpp.s
@@ -149,7 +149,7 @@ BuildMaker.s: BuildMaker.cpp.s
 
 # target to generate assembly for a file
 BuildMaker.cpp.s:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.s
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.s
 .PHONY : BuildMaker.cpp.s
 
 FileUtil.o: FileUtil.cpp.o
@@ -158,7 +158,7 @@ FileUtil.o: FileUtil.cpp.o
 
 # target to build an object file
 FileUtil.cpp.o:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o
 .PHONY : FileUtil.cpp.o
 
 FileUtil.i: FileUtil.cpp.i
@@ -167,7 +167,7 @@ FileUtil.i: FileUtil.cpp.i
 
 # target to preprocess a source file
 FileUtil.cpp.i:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.i
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.i
 .PHONY : FileUtil.cpp.i
 
 FileUtil.s: FileUtil.cpp.s
@@ -176,7 +176,7 @@ FileUtil.s: FileUtil.cpp.s
 
 # target to generate assembly for a file
 FileUtil.cpp.s:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.s
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.s
 .PHONY : FileUtil.cpp.s
 
 Item.o: Item.cpp.o
@@ -185,7 +185,7 @@ Item.o: Item.cpp.o
 
 # target to build an object file
 Item.cpp.o:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o
 .PHONY : Item.cpp.o
 
 Item.i: Item.cpp.i
@@ -194,7 +194,7 @@ Item.i: Item.cpp.i
 
 # target to preprocess a source file
 Item.cpp.i:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.i
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.i
 .PHONY : Item.cpp.i
 
 Item.s: Item.cpp.s
@@ -203,7 +203,7 @@ Item.s: Item.cpp.s
 
 # target to generate assembly for a file
 Item.cpp.s:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.s
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.s
 .PHONY : Item.cpp.s
 
 enums.o: enums.cpp.o
@@ -212,7 +212,7 @@ enums.o: enums.cpp.o
 
 # target to build an object file
 enums.cpp.o:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o
 .PHONY : enums.cpp.o
 
 enums.i: enums.cpp.i
@@ -221,7 +221,7 @@ enums.i: enums.cpp.i
 
 # target to preprocess a source file
 enums.cpp.i:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.i
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.i
 .PHONY : enums.cpp.i
 
 enums.s: enums.cpp.s
@@ -230,7 +230,7 @@ enums.s: enums.cpp.s
 
 # target to generate assembly for a file
 enums.cpp.s:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.s
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.s
 .PHONY : enums.cpp.s
 
 makeBuildGood.o: makeBuildGood.cpp.o
@@ -239,7 +239,7 @@ makeBuildGood.o: makeBuildGood.cpp.o
 
 # target to build an object file
 makeBuildGood.cpp.o:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o
 .PHONY : makeBuildGood.cpp.o
 
 makeBuildGood.i: makeBuildGood.cpp.i
@@ -248,7 +248,7 @@ makeBuildGood.i: makeBuildGood.cpp.i
 
 # target to preprocess a source file
 makeBuildGood.cpp.i:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.i
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.i
 .PHONY : makeBuildGood.cpp.i
 
 makeBuildGood.s: makeBuildGood.cpp.s
@@ -257,7 +257,7 @@ makeBuildGood.s: makeBuildGood.cpp.s
 
 # target to generate assembly for a file
 makeBuildGood.cpp.s:
-	cd /project/workspace/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.s
+	cd /project/makeBuildGood/build && $(MAKE) -f makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.s
 .PHONY : makeBuildGood.cpp.s
 
 # Help Target
@@ -295,6 +295,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /project/workspace/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /project/makeBuildGood/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

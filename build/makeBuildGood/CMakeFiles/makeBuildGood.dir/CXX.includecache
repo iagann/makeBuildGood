@@ -6,13 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/project/workspace/makeBuildGood/BuildMaker.cpp
+/project/makeBuildGood/makeBuildGood/BuildMaker.cpp
 BuildMaker.h
-/project/workspace/makeBuildGood/BuildMaker.h
+/project/makeBuildGood/makeBuildGood/BuildMaker.h
 PassiveCombination.h
-/project/workspace/makeBuildGood/PassiveCombination.h
+/project/makeBuildGood/makeBuildGood/PassiveCombination.h
 FileUtil.h
-/project/workspace/makeBuildGood/FileUtil.h
+/project/makeBuildGood/makeBuildGood/FileUtil.h
 iostream
 -
 iomanip
@@ -28,15 +28,15 @@ set
 list
 -
 
-/project/workspace/makeBuildGood/BuildMaker.h
+/project/makeBuildGood/makeBuildGood/BuildMaker.h
 enums.h
-/project/workspace/makeBuildGood/enums.h
+/project/makeBuildGood/makeBuildGood/enums.h
 Passive.h
-/project/workspace/makeBuildGood/Passive.h
+/project/makeBuildGood/makeBuildGood/Passive.h
 PassiveCombination.h
-/project/workspace/makeBuildGood/PassiveCombination.h
+/project/makeBuildGood/makeBuildGood/PassiveCombination.h
 Item.h
-/project/workspace/makeBuildGood/Item.h
+/project/makeBuildGood/makeBuildGood/Item.h
 map
 -
 set
@@ -48,9 +48,9 @@ omp.h
 chrono
 -
 
-/project/workspace/makeBuildGood/FileUtil.cpp
+/project/makeBuildGood/makeBuildGood/FileUtil.cpp
 FileUtil.h
-/project/workspace/makeBuildGood/FileUtil.h
+/project/makeBuildGood/makeBuildGood/FileUtil.h
 iterator
 -
 iostream
@@ -58,7 +58,7 @@ iostream
 sstream
 -
 
-/project/workspace/makeBuildGood/FileUtil.h
+/project/makeBuildGood/makeBuildGood/FileUtil.h
 sstream
 -
 string
@@ -68,33 +68,33 @@ fstream
 vector
 -
 
-/project/workspace/makeBuildGood/Item.cpp
+/project/makeBuildGood/makeBuildGood/Item.cpp
 Item.h
-/project/workspace/makeBuildGood/Item.h
+/project/makeBuildGood/makeBuildGood/Item.h
 iostream
 -
 sstream
 -
 
-/project/workspace/makeBuildGood/Item.h
+/project/makeBuildGood/makeBuildGood/Item.h
 enums.h
-/project/workspace/makeBuildGood/enums.h
+/project/makeBuildGood/makeBuildGood/enums.h
 map
 -
 vector
 -
 
-/project/workspace/makeBuildGood/Passive.h
+/project/makeBuildGood/makeBuildGood/Passive.h
 enums.h
-/project/workspace/makeBuildGood/enums.h
+/project/makeBuildGood/makeBuildGood/enums.h
 map
 -
 vector
 -
 
-/project/workspace/makeBuildGood/PassiveCombination.h
+/project/makeBuildGood/makeBuildGood/PassiveCombination.h
 enums.h
-/project/workspace/makeBuildGood/enums.h
+/project/makeBuildGood/makeBuildGood/enums.h
 map
 -
 string
@@ -104,19 +104,19 @@ sstream
 iostream
 -
 
-/project/workspace/makeBuildGood/enums.cpp
+/project/makeBuildGood/makeBuildGood/enums.cpp
 enums.h
-/project/workspace/makeBuildGood/enums.h
+/project/makeBuildGood/makeBuildGood/enums.h
 
-/project/workspace/makeBuildGood/enums.h
+/project/makeBuildGood/makeBuildGood/enums.h
 map
 -
 string
 -
 
-/project/workspace/makeBuildGood/makeBuildGood.cpp
+/project/makeBuildGood/makeBuildGood/makeBuildGood.cpp
 BuildMaker.h
-/project/workspace/makeBuildGood/BuildMaker.h
+/project/makeBuildGood/makeBuildGood/BuildMaker.h
 iostream
 -
 

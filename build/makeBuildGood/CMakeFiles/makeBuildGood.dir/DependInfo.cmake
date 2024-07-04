@@ -4,11 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/project/workspace/makeBuildGood/BuildMaker.cpp" "/project/workspace/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o"
-  "/project/workspace/makeBuildGood/FileUtil.cpp" "/project/workspace/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o"
-  "/project/workspace/makeBuildGood/Item.cpp" "/project/workspace/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o"
-  "/project/workspace/makeBuildGood/enums.cpp" "/project/workspace/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o"
-  "/project/workspace/makeBuildGood/makeBuildGood.cpp" "/project/workspace/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o"
+  "/project/makeBuildGood/makeBuildGood/BuildMaker.cpp" "/project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o"
+  "/project/makeBuildGood/makeBuildGood/FileUtil.cpp" "/project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o"
+  "/project/makeBuildGood/makeBuildGood/Item.cpp" "/project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o"
+  "/project/makeBuildGood/makeBuildGood/enums.cpp" "/project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o"
+  "/project/makeBuildGood/makeBuildGood/makeBuildGood.cpp" "/project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

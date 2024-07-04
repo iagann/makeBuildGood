@@ -2,19 +2,26 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "command": "rm -r build/*",
-      "name": "r"
+      "name": "cmake -S . -B build",
+      "command": "cmake -S . -B build"
     },
     {
-      "command": "cmake -S . -B build",
-      "name": "cmake -S . -B build"
-    },
-    {
-      "command": "cmake --build build",
-      "name": "cmake --build build"
+      "name": "cmake --build build",
+      "command": "cmake --build build"
     }
   ],
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
-  "tasks": {}
+  "tasks": {
+    "make real build": {
+      "name": "make real build",
+      "command": "build/makeBuildGood/makeBuildGood Release/real.txt",
+      "runAtStart": true
+    },
+    "make perfect build": {
+      "name": "make perfect build",
+      "command": "build/makeBuildGood/makeBuildGood Release/perfect.txt",
+      "runAtStart": true
+    }
+  }
 }

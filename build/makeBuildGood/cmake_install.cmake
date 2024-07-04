@@ -1,4 +1,4 @@
-# Install script for directory: /project/workspace/makeBuildGood
+# Install script for directory: /project/makeBuildGood/makeBuildGood
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

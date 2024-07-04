@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /project/workspace
+CMAKE_SOURCE_DIR = /project/makeBuildGood
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /project/workspace/build
+CMAKE_BINARY_DIR = /project/makeBuildGood/build
 
 # Include any dependencies generated for this target.
 include makeBuildGood/CMakeFiles/makeBuildGood.dir/depend.make
@@ -59,68 +59,68 @@ include makeBuildGood/CMakeFiles/makeBuildGood.dir/flags.make
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o: makeBuildGood/CMakeFiles/makeBuildGood.dir/flags.make
 makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o: ../makeBuildGood/BuildMaker.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o -c /project/workspace/makeBuildGood/BuildMaker.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/makeBuildGood/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o"
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.o -c /project/makeBuildGood/makeBuildGood/BuildMaker.cpp
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.i"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/workspace/makeBuildGood/BuildMaker.cpp > CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.i
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/makeBuildGood/makeBuildGood/BuildMaker.cpp > CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.i
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.s"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/workspace/makeBuildGood/BuildMaker.cpp -o CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.s
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/makeBuildGood/makeBuildGood/BuildMaker.cpp -o CMakeFiles/makeBuildGood.dir/BuildMaker.cpp.s
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o: makeBuildGood/CMakeFiles/makeBuildGood.dir/flags.make
 makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o: ../makeBuildGood/enums.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/enums.cpp.o -c /project/workspace/makeBuildGood/enums.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/makeBuildGood/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.o"
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/enums.cpp.o -c /project/makeBuildGood/makeBuildGood/enums.cpp
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/makeBuildGood.dir/enums.cpp.i"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/workspace/makeBuildGood/enums.cpp > CMakeFiles/makeBuildGood.dir/enums.cpp.i
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/makeBuildGood/makeBuildGood/enums.cpp > CMakeFiles/makeBuildGood.dir/enums.cpp.i
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/enums.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/makeBuildGood.dir/enums.cpp.s"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/workspace/makeBuildGood/enums.cpp -o CMakeFiles/makeBuildGood.dir/enums.cpp.s
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/makeBuildGood/makeBuildGood/enums.cpp -o CMakeFiles/makeBuildGood.dir/enums.cpp.s
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o: makeBuildGood/CMakeFiles/makeBuildGood.dir/flags.make
 makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o: ../makeBuildGood/FileUtil.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o -c /project/workspace/makeBuildGood/FileUtil.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/makeBuildGood/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o"
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/FileUtil.cpp.o -c /project/makeBuildGood/makeBuildGood/FileUtil.cpp
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/makeBuildGood.dir/FileUtil.cpp.i"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/workspace/makeBuildGood/FileUtil.cpp > CMakeFiles/makeBuildGood.dir/FileUtil.cpp.i
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/makeBuildGood/makeBuildGood/FileUtil.cpp > CMakeFiles/makeBuildGood.dir/FileUtil.cpp.i
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/FileUtil.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/makeBuildGood.dir/FileUtil.cpp.s"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/workspace/makeBuildGood/FileUtil.cpp -o CMakeFiles/makeBuildGood.dir/FileUtil.cpp.s
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/makeBuildGood/makeBuildGood/FileUtil.cpp -o CMakeFiles/makeBuildGood.dir/FileUtil.cpp.s
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o: makeBuildGood/CMakeFiles/makeBuildGood.dir/flags.make
 makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o: ../makeBuildGood/Item.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/Item.cpp.o -c /project/workspace/makeBuildGood/Item.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/makeBuildGood/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.o"
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/Item.cpp.o -c /project/makeBuildGood/makeBuildGood/Item.cpp
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/makeBuildGood.dir/Item.cpp.i"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/workspace/makeBuildGood/Item.cpp > CMakeFiles/makeBuildGood.dir/Item.cpp.i
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/makeBuildGood/makeBuildGood/Item.cpp > CMakeFiles/makeBuildGood.dir/Item.cpp.i
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/makeBuildGood.dir/Item.cpp.s"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/workspace/makeBuildGood/Item.cpp -o CMakeFiles/makeBuildGood.dir/Item.cpp.s
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/makeBuildGood/makeBuildGood/Item.cpp -o CMakeFiles/makeBuildGood.dir/Item.cpp.s
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o: makeBuildGood/CMakeFiles/makeBuildGood.dir/flags.make
 makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o: ../makeBuildGood/makeBuildGood.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o -c /project/workspace/makeBuildGood/makeBuildGood.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/project/makeBuildGood/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o"
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o -c /project/makeBuildGood/makeBuildGood/makeBuildGood.cpp
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.i"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/workspace/makeBuildGood/makeBuildGood.cpp > CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.i
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /project/makeBuildGood/makeBuildGood/makeBuildGood.cpp > CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.i
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.s"
-	cd /project/workspace/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/workspace/makeBuildGood/makeBuildGood.cpp -o CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.s
+	cd /project/makeBuildGood/build/makeBuildGood && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /project/makeBuildGood/makeBuildGood/makeBuildGood.cpp -o CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.s
 
 # Object files for target makeBuildGood
 makeBuildGood_OBJECTS = \
@@ -140,8 +140,8 @@ makeBuildGood/makeBuildGood: makeBuildGood/CMakeFiles/makeBuildGood.dir/Item.cpp
 makeBuildGood/makeBuildGood: makeBuildGood/CMakeFiles/makeBuildGood.dir/makeBuildGood.cpp.o
 makeBuildGood/makeBuildGood: makeBuildGood/CMakeFiles/makeBuildGood.dir/build.make
 makeBuildGood/makeBuildGood: makeBuildGood/CMakeFiles/makeBuildGood.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/project/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable makeBuildGood"
-	cd /project/workspace/build/makeBuildGood && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/makeBuildGood.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/project/makeBuildGood/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable makeBuildGood"
+	cd /project/makeBuildGood/build/makeBuildGood && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/makeBuildGood.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 makeBuildGood/CMakeFiles/makeBuildGood.dir/build: makeBuildGood/makeBuildGood
@@ -149,10 +149,10 @@ makeBuildGood/CMakeFiles/makeBuildGood.dir/build: makeBuildGood/makeBuildGood
 .PHONY : makeBuildGood/CMakeFiles/makeBuildGood.dir/build
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/clean:
-	cd /project/workspace/build/makeBuildGood && $(CMAKE_COMMAND) -P CMakeFiles/makeBuildGood.dir/cmake_clean.cmake
+	cd /project/makeBuildGood/build/makeBuildGood && $(CMAKE_COMMAND) -P CMakeFiles/makeBuildGood.dir/cmake_clean.cmake
 .PHONY : makeBuildGood/CMakeFiles/makeBuildGood.dir/clean
 
 makeBuildGood/CMakeFiles/makeBuildGood.dir/depend:
-	cd /project/workspace/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /project/workspace /project/workspace/makeBuildGood /project/workspace/build /project/workspace/build/makeBuildGood /project/workspace/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/DependInfo.cmake --color=$(COLOR)
+	cd /project/makeBuildGood/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /project/makeBuildGood /project/makeBuildGood/makeBuildGood /project/makeBuildGood/build /project/makeBuildGood/build/makeBuildGood /project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : makeBuildGood/CMakeFiles/makeBuildGood.dir/depend
 
