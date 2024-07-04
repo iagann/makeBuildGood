@@ -171,7 +171,7 @@ void BuildMaker::makeGoodBuild() {
 
 	std::cout << std::endl;
 	printPassiveCombination(STRINGS::PASSIVE_NAME_MAP, bestPassives);
-	std::cout << "If passive would change: " << std::endl;
+	std::cout << std::endl << "If passive would change: " << std::endl;
 	const auto allPassives = bestPassives.getPassives();
 	std::vector<std::tuple<double, PASSIVE_NAME, bool>> passiveChanges;
 	for (const auto& passive : allPassives) {
@@ -205,11 +205,7 @@ void BuildMaker::makeGoodBuild() {
 				<< passiveCount << " -> " << (passiveCount - 1)
 				<< " " << STRINGS::PASSIVE_NAME_MAP.at(passive) << std::endl;
 	}
-	
-	calculateDpsIf(bestPassives);
-	std::cout << std::endl << "DPS: " << bestDps << std::endl;
-	std::cout << std::endl << "crit%: " << lastCritChance << std::endl;
-	
+
 	// passive recommendations
 	/*std::cout << realPassives.totalPoints() << std::endl;
 	std::cout << realPassives.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;
@@ -217,7 +213,7 @@ void BuildMaker::makeGoodBuild() {
 	std::cout << bestPassives.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;*/
 	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
 		auto realDps = calculateDpsIf(realPassives);
-		std::cout << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
+		std::cout << std::endl << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
 		for (auto passive : realPassives.getPassives()) {
 			if (bestPassives.getPassivePoints(passive.first) != passive.second) {
 				PassiveCombination<PASSIVE_NAME> changedPassive = realPassives;
@@ -231,16 +227,22 @@ void BuildMaker::makeGoodBuild() {
 				std::cout << ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << std::endl;*/
 				std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << passive.second
 					<< " -> " << bestPassives.getPassivePoints(passive.first)
-					<< ", " << 100*(ifDps-realDps)/realDps/((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << "% dps per point"
+					<< ", " << 100 * (ifDps - realDps) / realDps / ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << "% dps per point"
 					<< std::endl;
 			}
 		}
-		std::cout << std::endl;
 	}
+	std::cout << std::endl;
+	
+	calculateDpsIf(bestPassives);
+	std::cout << std::endl << "DPS: " << bestDps << std::endl;
+	std::cout << std::endl << "crit%: " << lastCritChance << std::endl;
 
 	auto t2 = high_resolution_clock::now();
 	duration<double, std::milli> ms_double = t2 - t1;
 	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
+
+	return;
 
 	std::cout << "Press any key to show detailed DPS calculation" << std::endl;
 	system("pause");
@@ -763,7 +765,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE PER DEXTERITY: " << increasedDamagePerDex << std::endl;
 		double increasedDamagePerMs = statSum(currentStats, INCREASED_MOVEMENT_SPEED) * statSum(currentStats, INCREASED_DAMAGE_PER_MOVEMENT_SPEED);
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE PER MOVEMENT SPEED: " << increasedDamagePerMs << std::endl;
-		double increasedDamage = statSum(currentStats, INCREASED_MINION_DAMAGE) + (statSum(currentStats, INCREASED_DAMAGE) + increasedDamagePerMs) * damageRatio + increasedDamagePerDex;
+		double increasedDamage = statSum(currentStats, INCREASED_MINION_DAMAGE) + statSum(currentStats, INCREASED_BOW_DAMAGE)  + (statSum(currentStats, INCREASED_DAMAGE) + increasedDamagePerMs) * damageRatio + increasedDamagePerDex;
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE: " << increasedDamage << std::endl;
 		double increasedDamageFalcon = statSum(currentStats, INCREASED_MINION_DAMAGE) + (statSum(currentStats, INCREASED_DAMAGE) + increasedDamagePerMs) * 0.75 + increasedDamagePerDex;
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE FALCON: " << increasedDamageFalcon << std::endl;
@@ -1381,7 +1383,10 @@ bool BuildMaker::importFile(const std::string& filename) {
 
 	if (validItem)
 		addItemCandidate(item);
-	bestSkills = currentSkills = importedSkills;
+	skillSet.clear();
+	skillSet.push_back(importedSkills);
+	skillSetKestrel.clear();
+	skillSetKestrel.push_back(importedSkills);
 	if (importedPassives != PassiveCombination<PASSIVE_NAME>())
 		realPassives = importedPassives;
 

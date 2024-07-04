@@ -81,7 +81,7 @@ public:
 		bool first = true;
 		//ss << prevComboId << ":" << universalStrings.at(lastAddedPassive) << ":" << (passives.at(lastAddedPassive) - 1) << "->" << passives.at(lastAddedPassive) << std::endl;
 		for (auto& passive : passives) {
-			ss << (first ? "" : ",") << universalStrings.at(passive.first) << "=" << passive.second;
+			ss << (first ? "" : ",\n") << universalStrings.at(passive.first) << " = " << passive.second;
 			first = false;
 		}
 		//ss << std::endl << "---------------------------------------------------------------------------------------------------------------" << std::endl;

@@ -147,10 +147,13 @@ private:
 	}
 	template <typename T>
 	void printPassiveCombination(std::map<T, std::string> universalStrings, PassiveCombination<T> combo) {
+		std::cout << combo.toString(universalStrings) << std::endl;
+		/*
 		for (auto passive : combo.getPassives()) {
 			std::cout << universalStrings.at(passive.first) << " = " << passive.second << ", ";
 		}
 		std::cout << std::endl;
+		*/
 	}
 	template <typename T>
 	std::pair<DEPENDENCY, T> dependencySatisfied(std::map<T, Passive<T>>& universalPassives, PassiveCombination<T>& combo, T passiveName) {

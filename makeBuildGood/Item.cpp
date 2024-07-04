@@ -9,6 +9,8 @@ Item Item::withStat(STAT_NAME stat, double value) {
 }
 
 std::string Item::toString() const {
+	return getName() + " (" + STRINGS::ITEM_TYPE_MAP.at(getType()) + ")";
+	/*
 	std::stringstream ss;
 	ss << getName() << " (" << STRINGS::ITEM_TYPE_MAP.at(getType()) << "): ";
 	bool first = true;
@@ -19,6 +21,7 @@ std::string Item::toString() const {
 		first = false;
 	}
 	return ss.str();
+	*/
 }
 
 bool Item::operator<(const Item& other) const {
