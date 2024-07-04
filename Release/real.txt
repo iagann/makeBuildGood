@@ -1,6 +1,6 @@
 allowSameItems 0
 allowAilments 1
-disableCriticalVulnerability 0
+disableCriticalVulnerability 1
 
 PASSIVES
 

@@ -241,8 +241,6 @@ void BuildMaker::makeGoodBuild() {
 	auto t2 = high_resolution_clock::now();
 	duration<double, std::milli> ms_double = t2 - t1;
 	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
-
-	return;
 	
 	std::cout << "Press any key to show detailed DPS calculation" << std::endl;
 	system("pause");
@@ -446,7 +444,7 @@ void BuildMaker::initSkills() {
 			.withStat(STAT_NAME::INTELLIGENCE, 1)
 			// Aerial Assauilt
 			.withStat(STAT_NAME::MORE_DAMAGE_PER_INTELLIGENCE, 2)
-			.withStat(STAT_NAME::INCREASED_ATTACK_SPEED, 75)
+			.withStat(STAT_NAME::MORE_ATTACK_SPEED, 75)
 			.withStat(STAT_NAME::DEXTERITY, 16)
 			// haste
 			.withStat(STAT_NAME::INCREASED_MOVEMENT_SPEED, 30*1.2)
@@ -866,7 +864,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE: " << uncappedCritChance << "%" << std::endl;
 		double cappedCritChance = std::min<double>(uncappedCritChance, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE: " << (cappedCritChance * 100) << "%" << std::endl;
-		double effectiveCritMulti = cappedCritChance * totalCritMulti + 100 - cappedCritChance;
+		double effectiveCritMulti = cappedCritChance * totalCritMulti + 100 - cappedCritChance * 100;
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI: " << effectiveCritMulti << "%" << std::endl;
 		double totalCritMultiFalcon = increasedCritMultiOwn * 0.75 + increasedCritMultiMinions + criticalStrikeAvoidanceMulti;
 		if (verbose >= 2) std::cout << "CRIT MULTI TOTAL FALCON: " << totalCritMultiFalcon << "%" << std::endl;
@@ -875,7 +873,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "UNCAPPED CRIT CHANCE FALCON: " << uncappedCritChanceFalcon << "%" << std::endl;
 		double cappedCritChanceFalcon = std::min<double>(uncappedCritChanceFalcon, 100) / 100;
 		if (verbose >= 2) std::cout << "CAPPED CRIT CHANCE FALCON: " << (cappedCritChanceFalcon * 100) << "%" << std::endl;
-		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMultiFalcon + 100 - cappedCritChanceFalcon;
+		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMultiFalcon + 100 - cappedCritChanceFalcon * 100;
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI FALCON: " << effectiveCritMultiFalcon << "%" << std::endl << std::endl;
 
 		double totalPhysHit = flatPhys * (100 + increasedDamage + increasedMinionPhys) / 100 * moreDamage / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMulti / 100);
@@ -900,7 +898,8 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << std::setw(w1) << "PHYSICAL DPS DIVE BOMB:" << std::setw(w2) << totalHitDiveBomb * hitsPerSecondDiveBomb << std::setw(w3) << (totalHitDiveBomb * hitsPerSecondDiveBomb / dps * 100) << "%" << std::endl << std::endl;
 
 		if (verbose >= 2) std::cout << std::setw(w1) << "TOTAL DPS: " << std::setw(w2) << dps << std::endl;
-		if (verbose >= 2) std::cout << std::setw(w1) << "VULNI CRIT: " << std::setw(w2) << uncappedCritChance << "%" << std::endl;
+		if (!disableCriticalVulnerability)
+			if (verbose >= 2) std::cout << std::setw(w1) << "VULNI CRIT: " << std::setw(w2) << uncappedCritChance << "%" << std::endl;
 		if (verbose >= 2) std::cout << std::setw(w1) << "NO VULNI CRIT: " << std::setw(w2) << baseCrit * (100 + increasedCritChance) / 100 << "%" << std::endl;
 
 		return dps;
