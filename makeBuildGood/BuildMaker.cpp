@@ -243,7 +243,7 @@ void BuildMaker::makeGoodBuild() {
 	std::cout << "Total execution time: " << ms_double.count() << "ms" << std::endl << std::endl;
 
 	return;
-
+	
 	std::cout << "Press any key to show detailed DPS calculation" << std::endl;
 	system("pause");
 

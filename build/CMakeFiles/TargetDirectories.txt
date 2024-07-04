@@ -1,5 +1,5 @@
-/mnt/c/c/makeBuildGood/build/CMakeFiles/edit_cache.dir
-/mnt/c/c/makeBuildGood/build/CMakeFiles/rebuild_cache.dir
-/mnt/c/c/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir
-/mnt/c/c/makeBuildGood/build/makeBuildGood/CMakeFiles/edit_cache.dir
-/mnt/c/c/makeBuildGood/build/makeBuildGood/CMakeFiles/rebuild_cache.dir
+/project/makeBuildGood/build/CMakeFiles/rebuild_cache.dir
+/project/makeBuildGood/build/CMakeFiles/edit_cache.dir
+/project/makeBuildGood/build/makeBuildGood/CMakeFiles/rebuild_cache.dir
+/project/makeBuildGood/build/makeBuildGood/CMakeFiles/edit_cache.dir
+/project/makeBuildGood/build/makeBuildGood/CMakeFiles/makeBuildGood.dir
