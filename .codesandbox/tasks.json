@@ -1,0 +1,20 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "command": "rm -r build/*",
+      "name": "r"
+    },
+    {
+      "command": "cmake -S . -B build",
+      "name": "cmake -S . -B build"
+    },
+    {
+      "command": "cmake --build build",
+      "name": "cmake --build build"
+    }
+  ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {}
+}
