@@ -30,6 +30,8 @@ public:
 	bool disableCriticalVulnerability;
 	bool allowSameItems;
 	bool staticAerial;
+	bool withPursuit;
+	bool withReflection;
 	PassiveCombination<PASSIVE_NAME> realPassives;
 private:
 	enum IMPORT_STATE {

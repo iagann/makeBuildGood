@@ -14,6 +14,7 @@ public:
 		, absoluteMinimum(0)
 		, thresholdStatLimit(0)
 		, thresholdStatValue(0)
+		, enabled(true)
 	{}
 
 	Passive withThresholdStat(unsigned int limit, STAT_NAME stat, double value) {
@@ -41,8 +42,12 @@ public:
 		return *this;
 	}
 
-	unsigned int getMaximumPoints() { return maxPoints; }
-	unsigned int getAbsoluteMinimum() { return absoluteMinimum; }
+	void disable() { enabled = false; }
+	void enable() { enabled = true; }
+
+	unsigned int getMaximumPoints() { return enabled ? maxPoints : 0; }
+	unsigned int getAbsoluteMinimum() { return enabled ? absoluteMinimum : 0; }
+
 	std::vector<std::pair<STAT_NAME, double>> getStats(int points) {
 		std::vector<std::pair<STAT_NAME, double>> result = stats;
 		for (auto& stat : result)
@@ -68,4 +73,6 @@ private:
 	PASSIVE_CLASS_NAME passiveClassName;
 	std::map<PASSIVE_CLASS_NAME, unsigned int> minimumClassPointsMap;
 	std::map<T, unsigned int> dependMap;
+
+	bool enabled;
 };

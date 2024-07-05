@@ -21,6 +21,8 @@ BuildMaker::BuildMaker()
 	disableCriticalVulnerability = false;
 	allowSameItems = true;
 	staticAerial = false;
+	withPursuit = true;
+	withReflection = false;
 	imported = false;
 
 	usedItemsInit = {
@@ -302,9 +304,10 @@ void BuildMaker::initPassives() {
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
 		));
 		passives.insert(std::make_pair(
-			PASSIVE_NAME::ASSASSINS_QUIVER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
+			PASSIVE_NAME::ASSASSINS_QUIVER, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
 			.withStat(STAT_NAME::FLAT_PHYSICAL_DAMAGE, 1)
 			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_CHANCE, 8)
+			.withThresholdStat(5, STAT_NAME::BASE_CRITICAL_STRIKE_CHANCE, 2)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::BASE, 20)
 			.withAbsoluteMinimum(1)
 		));
@@ -312,11 +315,12 @@ void BuildMaker::initPassives() {
 			PASSIVE_NAME::MISSILE_MASTERY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 10)
 			.withStat(STAT_NAME::INCREASED_DAMAGE, 5)
 			.withStat(STAT_NAME::ARMOUR_SHRED_CHANCE, 5)
+			.withThresholdStat(5, STAT_NAME::ARMOUR_SHRED_EFFECT, 50)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
 		));
 		passives.insert(std::make_pair(
 			PASSIVE_NAME::CONCENTRATION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
-			.withStat(STAT_NAME::INCREASED_DAMAGE, 15)
+			.withStat(STAT_NAME::MORE_DAMAGE, 2)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
 		));
 		passives.insert(std::make_pair(
@@ -324,7 +328,20 @@ void BuildMaker::initPassives() {
 			.withStat(STAT_NAME::CRITICAL_VULNERABILITY_CHANCE, 10)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 10)
 			.withDependency(PASSIVE_NAME::ASSASSINS_QUIVER, 1)
-			.withAbsoluteMinimum(2)
+			.withAbsoluteMinimum(1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::MEDITAION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 1)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 15)
+			.withDependency(PASSIVE_NAME::CONCENTRATION, 1)
+			.withAbsoluteMinimum(1)
+		));
+		passives.insert(std::make_pair(
+			PASSIVE_NAME::REFLECTION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
+			.withStat(STAT_NAME::INCREASED_MOVEMENT_SPEED, 2)
+			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 20)
+			.withDependency(PASSIVE_NAME::MEDITAION, 1)
+			.withAbsoluteMinimum(5)
 		));
 		passives.insert(std::make_pair(
 			PASSIVE_NAME::HEIGHTENED_SENCES, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 5)
@@ -332,7 +349,7 @@ void BuildMaker::initPassives() {
 			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 5)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 20)
 			.withDependency(PASSIVE_NAME::WOUND_MAKER, 1)
-			//.withAbsoluteMinimum(5)
+			.withAbsoluteMinimum(5)
 		));
 		// FALCONER
 		passives.insert(std::make_pair(
@@ -394,7 +411,7 @@ void BuildMaker::initPassives() {
 			.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_CHANCE, 6)
 			.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 6)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 35)
-			.withAbsoluteMinimum(2)
+			.withAbsoluteMinimum(6)
 		));
 		passives.insert(std::make_pair(
 			PASSIVE_NAME::EXPEDIENCY, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 5)
@@ -404,7 +421,7 @@ void BuildMaker::initPassives() {
 		passives.insert(std::make_pair(
 			PASSIVE_NAME::FINESSE_THEM, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::FALCONER, 7)
 			.withStat(STAT_NAME::CRITICAL_STRIKE_AVOIDANCE, 5)
-			.withThresholdStat(5, STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER_PER_CRITICAL_STRIKE_AVOIDANCE, 1.5)
+			.withThresholdStat(5, STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER_PER_CRITICAL_STRIKE_AVOIDANCE, 0.5)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::FALCONER, 40)
 			.withDependency(PASSIVE_NAME::NEEDLE_LIKE_PRECISION, 2)
 			.withAbsoluteMinimum(5)
@@ -487,6 +504,11 @@ void BuildMaker::initSkills() {
 			.withStat(STAT_NAME::MORE_ATTACK_SPEED, 12)
 			.withStat(STAT_NAME::MORE_DAMAGE, -5)
 			.withAbsoluteMinimum(1)
+		));
+		skills.insert(std::make_pair(
+			SKILL_PASSIVE_NAME::TWINNED_BOLTS, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 4)
+			.withDependency(SKILL_PASSIVE_NAME::LIGHT_BOLTS, 3)
+			.withStat(STAT_NAME::MORE_ATTACK_SPEED, 10)
 		));
 		skills.insert(std::make_pair(
 			SKILL_PASSIVE_NAME::SHARPENED_TIPS, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 2)
@@ -747,9 +769,9 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 
 		double addedflatPhysFalcon = statSum(currentStats, FLAT_MINION_PHYSICAL_DAMAGE_FALCON);
 		if (verbose >= 2) std::cout << "ADDED FLAT PHYSICAL DAMAGE FALCON: " << addedflatPhysFalcon << std::endl;
-		double flatPhysFalcon = 30 + addedflatPhysFalcon * 1.5;
+		double flatPhysFalcon = (30 + addedflatPhysFalcon * 1.5) * 0.86;
 		if (verbose >= 2) std::cout << "ATTACK FLAT PHYSICAL DAMAGE FALCON: " << flatPhysFalcon << std::endl;
-		double flatPhysDiveBomb = 170 + addedflatPhysFalcon * 8.5 + 80 + addedflatPhysFalcon * 4; // + feather
+		double flatPhysDiveBomb = (140 + addedflatPhysFalcon * 7 + 80 + addedflatPhysFalcon * 4) * 0.86; // + feather
 		if (verbose >= 2) std::cout << "DIVE BOMB PHYSICAL DAMAGE FALCON: " << flatPhysDiveBomb << std::endl << std::endl;
 
 		double increasedAttackSpeed1 = statSum(currentStats, INCREASED_ATTACK_SPEED);
@@ -798,10 +820,10 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		
 		
 		double hitsPerSecondFalcon = 1.257 * 1.2 * 1.16;
+		if (staticAerial) hitsPerSecondFalcon = 0;
+		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl;
 		double cdr = statSum(currentStats, COOLDOWN_RECOVERY_SPEED);
 		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4 + cdr / 100) / 5;
-		if (staticAerial) hitsPerSecondFalcon = 0;
-		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl << std::endl;
 		if (verbose >= 2) std::cout << "DIVE BOMB HITS PER SECOND: " << hitsPerSecondDiveBomb << std::endl << std::endl;
 
 		double increasedDamagePerDex = dex * statSum(currentStats, INCREASED_MINION_DAMAGE_PER_DEXTERITY);
@@ -827,7 +849,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 
 		double ailmentRatio = statSum(currentStats, AILMENT_STAT_RATIO) / 100;
 		if (verbose >= 2) std::cout << "SHARED AILMENTS RATIO: " << (ailmentRatio * 100) << "%" << std::endl;
-		double averageStacks = 4 * (ailmentRatio * hitsPerSecond + 2 * hitsPerSecondFalcon) / 100;
+		double averageStacks = 4 * (ailmentRatio * hitsPerSecond + hitsPerSecondFalcon) / 100;
 		if (!stacks) averageStacks = 0;
 		if (verbose >= 2) std::cout << "AVERAGE AILMENT STACKS FOR 1% chance: " << averageStacks << std::endl;
 		
@@ -859,7 +881,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY YOU AND BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
 		double averageArmourShredStacksBallista = !stacks ? 0 : 4 * ((ailmentRatio * hitsPerSecond * (100 + ailmentRatio) / 100) * armourShredChance) / 100;
 		double averageArmourShredStacksFalcon = !stacks ? 0 : 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
-		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 4);
+		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 5);
 		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
 		double averageSmokeBombStacks = 4 * 8 * ((staticAerial ? 4*1.4 : 4*1.5) / ((staticAerial ? 5 : 10) * 1.5 / (100 + cdr) * 100));
 		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
@@ -1262,8 +1284,10 @@ void BuildMaker::exportFile(const std::string& filename) {
 
 	ss << "allowSameItems " << allowSameItems << std::endl;
 	ss << "allowAilments " << stacks << std::endl;
-	ss << "disableCriticalVulnerability " << disableCriticalVulnerability << std::endl << std::endl;
-	ss << "staticAerial " << staticAerial << std::endl << std::endl;
+	ss << "disableCriticalVulnerability " << disableCriticalVulnerability << std::endl;
+	ss << "staticAerial " << staticAerial << std::endl;
+	ss << "withPursuit " << withPursuit << std::endl;
+	ss << "withReflection " << withReflection << std::endl << std::endl;
 
 	if (realPassives != PassiveCombination<PASSIVE_NAME>()) {
 		ss << "PASSIVES" << std::endl << std::endl;
@@ -1368,6 +1392,12 @@ bool BuildMaker::importFile(const std::string& filename) {
 				else if (key == "staticAerial") {
 					staticAerial = value;
 				}
+				else if (key == "withPursuit") {
+					withPursuit = value;
+				}
+				else if (key == "withReflection") {
+					withReflection = value;
+				}
 				else {
 					std::cerr << "Import error: unknown global parameter '" << key << "' at line " << n + 1 << ": " << line << std::endl;
 					return false;
@@ -1437,6 +1467,21 @@ bool BuildMaker::importFile(const std::string& filename) {
 	skillSetKestrel.push_back(importedSkills);
 	if (importedPassives != PassiveCombination<PASSIVE_NAME>())
 		realPassives = importedPassives;
+
+	if (withReflection) {
+		passives.at(MEDITAION).enable();
+		passives.at(REFLECTION).enable();
+	}
+	else {
+		passives.at(MEDITAION).disable();
+		passives.at(REFLECTION).disable();
+	}
+	if (withPursuit) {
+		passives.at(PURSUIT).enable();
+	}
+	else {
+		passives.at(PURSUIT).disable();
+	}
 
 	imported = true;
 
