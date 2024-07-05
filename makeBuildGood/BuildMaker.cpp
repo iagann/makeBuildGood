@@ -20,6 +20,7 @@ BuildMaker::BuildMaker()
 	reversePassiveSearch = true;
 	disableCriticalVulnerability = false;
 	allowSameItems = true;
+	staticAerial = false;
 	imported = false;
 
 	usedItemsInit = {
@@ -528,6 +529,16 @@ void BuildMaker::initSkills() {
 			.withStat(STAT_NAME::MORE_DAMAGE, 20)
 			.withAbsoluteMinimum(3)
 		));
+		skills.insert(std::make_pair(
+			SKILL_PASSIVE_NAME::QUICKLOAD, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
+			.withDependency(SKILL_PASSIVE_NAME::STURDY_FOUNDATION, 2)
+			.withAbsoluteMinimum(0)
+		));
+		skills.insert(std::make_pair(
+			SKILL_PASSIVE_NAME::SIEGE_COMMANDER, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
+			.withDependency(SKILL_PASSIVE_NAME::QUICKLOAD, 1)
+			.withAbsoluteMinimum(0)
+		));
 	}
 
 	std::set<PassiveCombination<SKILL_PASSIVE_NAME>> basePassiveCombinationSet;
@@ -745,19 +756,51 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED FROM ITEMS: " << increasedAttackSpeed1 << std::endl;
 		double increasedAttackSpeed2 = statSum(currentStats, INCREASED_ATTACK_SPEED_PER_DEXTERITY) * dex;
 		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED FROM DEXTERITY: " << increasedAttackSpeed2 << std::endl;
-		double increasedAttackSpeed = increasedAttackSpeed1 + increasedAttackSpeed2;
+		double increasedAttackSpeed3 = currentSkills.getPassives().at(SIEGE_COMMANDER) ? 20 : 0;
+		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED FROM SIEGE COMMANDER: " << increasedAttackSpeed3 << std::endl;
+
+		double increasedAttackSpeed = increasedAttackSpeed1 + increasedAttackSpeed2 + increasedAttackSpeed3;
 		if (verbose >= 2) std::cout << "INCREASED ATTACK SPEED: " << increasedAttackSpeed << std::endl;
 		double moreAttackSpeed = statProduct(currentStats, MORE_ATTACK_SPEED);
 		if (verbose >= 2) std::cout << "MORE ATTACK SPEED: " << moreAttackSpeed << "%" << std::endl;
-		double hitsPerSecond = 6 * 0.717 * (100 + increasedAttackSpeed) / 100 * (100 + moreAttackSpeed) / 100;
+		double hitsPerSecond = 0;
+		{
+			double duration = 10 * (100
+					- currentSkills.getPassives().at(SIEGE_COMMANDER) * 25
+					- currentSkills.getPassives().at(EFFICIENT_CONSTRUCTION) * 20
+					+ currentSkills.getPassives().at(STURDY_FOUNDATION) * 15) / 100
+				- 0.7 - 6 * 0.6 * 100 / (100 + dex) / 2;
+			if (verbose >= 2) std::cout << "BALLISTA DURATION: " << duration << std::endl;
+			int eventCount = 0;
+			double currentTime = 0;
+			double baseSpeed = 0.717 * (100 + moreAttackSpeed) / 100;
+			double increase = increasedAttackSpeed;
+			const bool quickload = currentSkills.getPassives().at(QUICKLOAD) ? 1 : 0;
+
+			while (currentTime < duration) {
+				double occurrenceSpeed = baseSpeed * (100 + increase) / 100;
+				double timeToNextEvent = 1 / occurrenceSpeed;
+
+				if (currentTime + timeToNextEvent > duration) {
+					break;
+				}
+
+				currentTime += timeToNextEvent;
+				eventCount++;
+				if (quickload)
+					increase += 2;
+			}
+			hitsPerSecond = 6 * eventCount / duration;
+			if (verbose >= 2) std::cout << "BALLISTA HITS PER LIFETIME: " << 6 * eventCount << std::endl;
+		}
+		
 		if (verbose >= 2) std::cout << "BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
 		double hitsPerSecondFalcon = 1.257 * 1.2 * 1.16;
-		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl << std::endl;
 		double cdr = statSum(currentStats, COOLDOWN_RECOVERY_SPEED);
 		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4 + cdr / 100) / 5;
+		if (staticAerial) hitsPerSecondFalcon = 0;
+		if (verbose >= 2) std::cout << "FALCON HITS PER SECOND: " << hitsPerSecondFalcon << std::endl << std::endl;
 		if (verbose >= 2) std::cout << "DIVE BOMB HITS PER SECOND: " << hitsPerSecondDiveBomb << std::endl << std::endl;
-		if (!stacks) hitsPerSecondFalcon = 0;
-		if (!stacks) hitsPerSecondDiveBomb = 0;
 
 		double increasedDamagePerDex = dex * statSum(currentStats, INCREASED_MINION_DAMAGE_PER_DEXTERITY);
 		if (verbose >= 2) std::cout << "INCREASED DAMAGE PER DEXTERITY: " << increasedDamagePerDex << std::endl;
@@ -811,12 +854,12 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double armourShredChance = statSum(currentStats, ARMOUR_SHRED_CHANCE);
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED ARMOUR: " << armourShredChance << "%" << std::endl;
 		double armourShredEffect = statSum(currentStats, ARMOUR_SHRED_EFFECT);
-		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
-		double averageArmourShredStacksBallista = 4 * ((ailmentRatio * hitsPerSecond * (100 + ailmentRatio) / 100) * armourShredChance) / 100;
-		double averageArmourShredStacksFalcon = 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
+		if (verbose >= 2) std::cout << "ARMOUR SHRED EFFECT (ONLY YOU AND BALLISTAS, NO FALCON): " << armourShredEffect << "%" << std::endl;
+		double averageArmourShredStacksBallista = !stacks ? 0 : 4 * ((ailmentRatio * hitsPerSecond * (100 + ailmentRatio) / 100) * armourShredChance) / 100;
+		double averageArmourShredStacksFalcon = !stacks ? 0 : 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
 		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 4);
 		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
-		double averageSmokeBombStacks = 4 * 8 * (4 / std::max<double>(4,  10 / (100 + cdr) * 100));
+		double averageSmokeBombStacks = 4 * 8 * ((staticAerial ? 4*1.4 : 4*1.5) / ((staticAerial ? 5 : 10) * 1.5 / (100 + cdr) * 100));
 		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
 			+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb
 			+ averageSmokeBombStacks * (100 + armourShredEffect) / 100) * 100;
@@ -1218,6 +1261,7 @@ void BuildMaker::exportFile(const std::string& filename) {
 	ss << "allowSameItems " << allowSameItems << std::endl;
 	ss << "allowAilments " << stacks << std::endl;
 	ss << "disableCriticalVulnerability " << disableCriticalVulnerability << std::endl << std::endl;
+	ss << "staticAerial " << staticAerial << std::endl << std::endl;
 
 	if (realPassives != PassiveCombination<PASSIVE_NAME>()) {
 		ss << "PASSIVES" << std::endl << std::endl;
@@ -1318,6 +1362,9 @@ bool BuildMaker::importFile(const std::string& filename) {
 				}
 				else if (key == "disableCriticalVulnerability") {
 					disableCriticalVulnerability = value;
+				}
+				else if (key == "staticAerial") {
+					staticAerial = value;
 				}
 				else {
 					std::cerr << "Import error: unknown global parameter '" << key << "' at line " << n + 1 << ": " << line << std::endl;

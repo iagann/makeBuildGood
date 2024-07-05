@@ -29,6 +29,7 @@ public:
 	bool reversePassiveSearch;
 	bool disableCriticalVulnerability;
 	bool allowSameItems;
+	bool staticAerial;
 	PassiveCombination<PASSIVE_NAME> realPassives;
 private:
 	enum IMPORT_STATE {
