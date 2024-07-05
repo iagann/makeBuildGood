@@ -791,10 +791,12 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 					increase += 2;
 			}
 			hitsPerSecond = 6 * eventCount / duration;
-			if (verbose >= 2) std::cout << "BALLISTA HITS PER LIFETIME: " << 6 * eventCount << std::endl;
+			if (verbose >= 2) std::cout << "BALLISTA HITS PER LIFETIME: " << eventCount << std::endl;
+			if (verbose >= 2) std::cout << "AVERAGE BALLISTA HITS PER SECOND: " << eventCount / duration << std::endl;
+			if (verbose >= 2) std::cout << "TOTAL BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
 		}
 		
-		if (verbose >= 2) std::cout << "BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
+		
 		double hitsPerSecondFalcon = 1.257 * 1.2 * 1.16;
 		double cdr = statSum(currentStats, COOLDOWN_RECOVERY_SPEED);
 		double hitsPerSecondDiveBomb = (1.0 + 0.12 * 4 + cdr / 100) / 5;
