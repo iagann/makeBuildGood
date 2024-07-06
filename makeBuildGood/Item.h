@@ -12,7 +12,7 @@ public:
 	{}
 
 	Item withStat(STAT_NAME stat, double value);
-	std::vector<std::pair<STAT_NAME, double>> getStats() { return stats; }
+	std::vector<std::pair<STAT_NAME, double>> getStats() const { return stats; }
 	const ITEM_TYPE getType() const { return itemType; }
 	const std::string getName() const { return name; }
 	std::string toString() const;
@@ -32,7 +32,7 @@ public:
 	ItemSet();
 	void addItem(ITEM_SLOT slot, Item item) { items.at(slot).push_back(item); }
 	std::vector<Item>& getItems(ITEM_SLOT slot) { return items.at(slot); }
-	std::vector<Item> getAllItems();
+	const std::vector<Item> getAllItems();
 	int hasItem(ITEM_SLOT slot) { return items.at(slot).size(); }
 	Item getItem(ITEM_SLOT slot) { return items.at(slot).at(0); }
 	std::map<ITEM_SLOT, Item> getItemSet();

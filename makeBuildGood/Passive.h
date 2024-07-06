@@ -48,7 +48,7 @@ public:
 	unsigned int getMaximumPoints() { return enabled ? maxPoints : 0; }
 	unsigned int getAbsoluteMinimum() { return enabled ? absoluteMinimum : 0; }
 
-	std::vector<std::pair<STAT_NAME, double>> getStats(int points) {
+	const std::vector<std::pair<STAT_NAME, double>> getStats(int points) {
 		std::vector<std::pair<STAT_NAME, double>> result = stats;
 		for (auto& stat : result)
 			stat.second *= points;

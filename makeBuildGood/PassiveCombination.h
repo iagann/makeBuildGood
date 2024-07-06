@@ -54,7 +54,7 @@ public:
 		}
 	}
 	//unsigned int totalPoints();
-	std::map<T, unsigned int> getPassives() { return passives; }
+	const std::map<T, unsigned int> getPassives() { return passives; }
 	unsigned int getPassivePoints(T passiveName) const {
 		auto it = passives.find(passiveName);
 		return (it != passives.end()) ? it->second : 0;

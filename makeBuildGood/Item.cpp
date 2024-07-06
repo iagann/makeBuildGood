@@ -58,7 +58,7 @@ ItemSet::ItemSet() {
 	};
 }
 
-std::vector<Item> ItemSet::getAllItems() {
+const std::vector<Item> ItemSet::getAllItems() {
 	std::vector<Item> result;
 	for (auto itemSlot : items) {
 		auto itemsByType = getItems(itemSlot.first);

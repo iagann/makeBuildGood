@@ -688,63 +688,39 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 	std::map<STAT_NAME, std::vector<std::pair<std::string, double>>> currentStats;
 	// PASSIVES
 	{
-		auto allPassives = ifPassives.getPassives();
-		for (auto passive : allPassives) {
-			Passive<PASSIVE_NAME>& passiveDefinition = passives.at(passive.first);
-			auto stats = passiveDefinition.getStats(passive.second);
-			for (auto stat : stats) {
+		const auto& allPassives = ifPassives.getPassives();
+		for (auto& passive : allPassives) {
+			auto& passiveDefinition = passives.at(passive.first);
+			const auto& stats = passiveDefinition.getStats(passive.second);
+			for (auto& stat : stats) {
 				if (verbose >= 2) std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << STRINGS::STAT_NAME_MAP.at(stat.first) << " = " << stat.second << std::endl;
-				auto it = currentStats.find(stat.first);
-				if (it == currentStats.end()) {
-					currentStats.insert(std::make_pair(stat.first,
-						std::vector<std::pair<std::string, double>>{
-						std::make_pair(STRINGS::PASSIVE_NAME_MAP.at(passive.first), stat.second)
-					}));
-				}
-				else {
-					it->second.push_back(std::make_pair(STRINGS::PASSIVE_NAME_MAP.at(passive.first), stat.second));
-				}
+				auto& vec = currentStats[stat.first];
+				vec.emplace_back(STRINGS::PASSIVE_NAME_MAP.at(passive.first), stat.second);
 			}
 		}
 	}
 	// SKILLS
 	{
-		auto allSkills = currentSkills.getPassives();
-		for (auto skillPassive : currentSkills.getPassives()) {
-			auto skillDefinition = skills.at(skillPassive.first);
-			auto stats = skillDefinition.getStats(skillPassive.second);
-			for (auto stat : stats) {
+		const auto& allSkills = currentSkills.getPassives();
+		for (auto& skillPassive : currentSkills.getPassives()) {
+			auto& skillDefinition = skills.at(skillPassive.first);
+			const auto& stats = skillDefinition.getStats(skillPassive.second);
+			for (auto& stat : stats) {
 				if (verbose >= 2) std::cout << STRINGS::SKILL_PASSIVE_NAME_MAP.at(skillPassive.first) << ": " << STRINGS::STAT_NAME_MAP.at(stat.first) << " = " << stat.second << std::endl;
-				auto it = currentStats.find(stat.first);
-				if (it == currentStats.end()) {
-					currentStats.insert(std::make_pair(stat.first,
-						std::vector<std::pair<std::string, double>>{
-						std::make_pair(STRINGS::SKILL_PASSIVE_NAME_MAP.at(skillPassive.first), stat.second)
-					}));
-				}
-				else {
-					it->second.push_back(std::make_pair(STRINGS::SKILL_PASSIVE_NAME_MAP.at(skillPassive.first), stat.second));
-				}
+				auto& vec = currentStats[stat.first];
+				vec.emplace_back(STRINGS::SKILL_PASSIVE_NAME_MAP.at(skillPassive.first), stat.second);
 			}
 		}
 	}
 	// ITEMS
 	{
-		auto allItems = currentItemSet.getAllItems();
-		for (auto item : allItems) {
-			auto stats = item.getStats();
-			for (auto stat : stats) {
+		const auto& allItems = currentItemSet.getAllItems();
+		for (auto& item : allItems) {
+			const auto& stats = item.getStats();
+			for (auto& stat : stats) {
 				if (verbose >= 2) std::cout << item.getName() << ": " << STRINGS::STAT_NAME_MAP.at(stat.first) << " = " << stat.second << std::endl;
-				auto it = currentStats.find(stat.first);
-				if (it == currentStats.end()) {
-					currentStats.insert(std::make_pair(stat.first,
-						std::vector<std::pair<std::string, double>>{
-						std::make_pair(item.getName(), stat.second)
-					}));
-				}
-				else {
-					it->second.push_back(std::make_pair(item.getName(), stat.second));
-				}
+				auto& vec = currentStats[stat.first];
+				vec.emplace_back(item.getName(), stat.second);
 			}
 		}
 	}
@@ -1286,17 +1262,24 @@ double BuildMaker::statSum(std::map<STAT_NAME, std::vector<std::pair<std::string
 		return 0;
 	}
 
-	auto stats = it->second;
-	
+	const auto& stats = it->second;  // Use const reference to avoid copying
 	double result = 0;
-	bool first = true;
-	for (auto stat : stats) {
-		if (verbose >= 2) std::cout << (first ? "" : " + ") << stat.first << ":" << stat.second;
-		result += stat.second;
-		first = false;
+
+	if (verbose >= 2) {
+		bool first = true;
+		for (const auto& stat : stats) {  // Use const reference to avoid copying each pair
+			std::cout << (first ? "" : " + ") << stat.first << ":" << stat.second;
+			result += stat.second;
+			first = false;
+		}
+		std::cout << " = " << result << std::endl;
 	}
-	if (verbose >= 2) std::cout << " = " << result << std::endl;
-	//std::cout << std::endl << "TOTAL " << STRINGS::STAT_NAME_MAP.at(statName) << " = " << result << std::endl;
+	else {
+		for (const auto& stat : stats) {  // Use const reference to avoid copying each pair
+			result += stat.second;
+		}
+	}
+
 	return result;
 }
 
