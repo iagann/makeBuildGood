@@ -32,6 +32,7 @@ public:
 	bool staticAerial;
 	bool withPursuit;
 	bool withReflection;
+	double smokeBombUptime;
 	PassiveCombination<PASSIVE_NAME> realPassives;
 private:
 	enum IMPORT_STATE {
@@ -255,7 +256,7 @@ private:
 	double calculateDpsIf(ItemSet ifItemSet);
 	double calculateDpsIf(PassiveCombination<SKILL_PASSIVE_NAME> ifSkills);
 	double calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives);
-	std::set<std::pair<double, double>> smokeBombShredProportions(bool staticAerial);
+	std::set<std::pair<double, double>> smokeBombShredProportions();
 	void findBestItems();
 	void findBestSkills();
 	void findBestPassives();

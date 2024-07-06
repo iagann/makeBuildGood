@@ -23,6 +23,7 @@ BuildMaker::BuildMaker()
 	staticAerial = false;
 	withPursuit = true;
 	withReflection = false;
+	smokeBombUptime = 100;
 	imported = false;
 
 	usedItemsInit = {
@@ -861,7 +862,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
 
 		// smoke bomb shred
-		auto smokeBombStackProportions = smokeBombShredProportions(staticAerial);
+		auto smokeBombStackProportions = smokeBombShredProportions();
 		//double averageSmokeBombStacks = 4 * 8 * ((staticAerial ? 4*1.4 : 4*1.5) / ((staticAerial ? 5 : 10) * 1.5 / (100 + cdr) * 100));
 		/*
 		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
@@ -978,7 +979,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 
 }
 
-std::set<std::pair<double, double>> BuildMaker::smokeBombShredProportions(bool staticAerial) {
+std::set<std::pair<double, double>> BuildMaker::smokeBombShredProportions() {
 	if (staticAerial) {
 		return {
 			{0.3, 40},
@@ -1308,7 +1309,8 @@ void BuildMaker::exportFile(const std::string& filename) {
 	ss << "disableCriticalVulnerability " << disableCriticalVulnerability << std::endl;
 	ss << "staticAerial " << staticAerial << std::endl;
 	ss << "withPursuit " << withPursuit << std::endl;
-	ss << "withReflection " << withReflection << std::endl << std::endl;
+	ss << "withReflection " << withReflection << std::endl;
+	ss << "smokeBombUptime " << smokeBombUptime << std::endl << std::endl;
 
 	if (realPassives != PassiveCombination<PASSIVE_NAME>()) {
 		ss << "PASSIVES" << std::endl << std::endl;
@@ -1418,6 +1420,9 @@ bool BuildMaker::importFile(const std::string& filename) {
 				}
 				else if (key == "withReflection") {
 					withReflection = value;
+				}
+				else if (key == "smokeBombUptime") {
+					smokeBombUptime = value;
 				}
 				else {
 					std::cerr << "Import error: unknown global parameter '" << key << "' at line " << n + 1 << ": " << line << std::endl;
