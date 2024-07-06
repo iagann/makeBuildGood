@@ -978,7 +978,6 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 
 }
 
-
 std::set<std::pair<double, double>> BuildMaker::smokeBombShredProportions(bool staticAerial) {
 	if (staticAerial) {
 		return {
@@ -1171,7 +1170,7 @@ std::pair<PassiveCombination<PASSIVE_NAME>, double> BuildMaker::findBestPassives
 		auto it = allPassives.begin(); // Get iterator for element at index i
 		std::advance(it, i);     // Advance iterator to the i-th element
 
-		auto passive = *it;
+		auto& passive = *it;
 		if (limit != PASSIVE_NAME::BASE_STATS && passive.first != limit)
 			continue;
 		if (passive.second == 0 || passive.second - 1 < passives.at(passive.first).getAbsoluteMinimum())
@@ -1180,21 +1179,9 @@ std::pair<PassiveCombination<PASSIVE_NAME>, double> BuildMaker::findBestPassives
 		maybeCombo.substractPassivePoint(passive.first, passives.at(passive.first).getClass());
 		auto dps = calculateDpsIf(maybeCombo);
 #pragma omp critical
-		passiveDpsVector.push_back(std::make_tuple(dps, passive.first, maybeCombo));
+		passiveDpsVector.emplace_back(dps, passive.first, maybeCombo);
 	}
-/*
-	for (auto passive : allPassives) {
-		if (limit != PASSIVE_NAME::BASE_STATS && passive.first != limit)
-			continue;
-		if (passive.second == 0 || passive.second-1 < passives.at(passive.first).getAbsoluteMinimum())
-			continue; // can't substract
-		auto maybeCombo = combo;
-		maybeCombo.substractPassivePoint(passive.first, passives.at(passive.first).getClass());
-		auto t = calculateDpsIf(maybeCombo);
-		auto dps = calculateDpsIf(maybeCombo);
-		passiveDpsVector.push_back(std::make_tuple(dps, passive.first, maybeCombo));
-	}
-*/
+
 	std::sort(passiveDpsVector.begin(), passiveDpsVector.end(), [](const auto& a, const auto& b) { return std::get<0>(a) < std::get<0>(b); });
 
 	if (verbose >= 2 ) for (auto it = passiveDpsVector.begin(); it != passiveDpsVector.end(); ++it) {
@@ -1207,7 +1194,7 @@ std::pair<PassiveCombination<PASSIVE_NAME>, double> BuildMaker::findBestPassives
 	// now check every starting from the worst
 	std::map<double, std::pair<PASSIVE_NAME, PassiveCombination<PASSIVE_NAME>>> maybeNewPassiveMap{
 		// somthing to always return, will be worse that anything
-		std::make_pair(0, std::make_pair(PASSIVE_NAME::BASE_STATS, PassiveCombination<PASSIVE_NAME>())) 
+		{ 0, {PASSIVE_NAME::BASE_STATS, PassiveCombination<PASSIVE_NAME>()} }
 	};
 	bool substractOk = false;
 	for (auto it = passiveDpsVector.rbegin(); it != passiveDpsVector.rend(); ++it) {
