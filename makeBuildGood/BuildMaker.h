@@ -255,6 +255,7 @@ private:
 	double calculateDpsIf(ItemSet ifItemSet);
 	double calculateDpsIf(PassiveCombination<SKILL_PASSIVE_NAME> ifSkills);
 	double calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives);
+	std::set<std::pair<double, double>> smokeBombShredProportions(bool staticAerial);
 	void findBestItems();
 	void findBestSkills();
 	void findBestPassives();

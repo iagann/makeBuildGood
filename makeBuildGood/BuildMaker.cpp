@@ -883,17 +883,45 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double averageArmourShredStacksFalcon = !stacks ? 0 : 4 * (2 * hitsPerSecondFalcon) * armourShredChance / 100;
 		double averageArmourShredStacksDiveBomb = 4 * (hitsPerSecondDiveBomb * 5);
 		double averageArmourShredStacks = averageArmourShredStacksBallista + averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb;
-		double averageSmokeBombStacks = 4 * 8 * ((staticAerial ? 4*1.4 : 4*1.5) / ((staticAerial ? 5 : 10) * 1.5 / (100 + cdr) * 100));
+
+		// smoke bomb shred
+		auto smokeBombStackProportions = smokeBombShredProportions(staticAerial);
+		//double averageSmokeBombStacks = 4 * 8 * ((staticAerial ? 4*1.4 : 4*1.5) / ((staticAerial ? 5 : 10) * 1.5 / (100 + cdr) * 100));
+		/*
 		double averageArmourShred = (averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
 			+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb
 			+ averageSmokeBombStacks * (100 + armourShredEffect) / 100) * 100;
 		if (!stacks) averageArmourShred = 0;
+		*/
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS: " << averageArmourShredStacks << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM BALLISTAS: " << averageArmourShredStacksBallista << std::endl;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM FALCON: " << averageArmourShredStacksFalcon << std::endl;
-		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM DIVE BOMB: " << averageArmourShredStacksDiveBomb << std::endl;
-		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM SMOKE BOMB: " << averageSmokeBombStacks << std::endl;
+		//if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED STACKS FROM DIVE BOMB: " << averageArmourShredStacksDiveBomb << std::endl;
+		if (verbose >= 2) {
+			std::cout << "AVERAGE ARMOUR SHRED STACKS FROM SMOKE BOMB PROPORTIONS:" << std::endl;
+			for (auto p : smokeBombStackProportions)
+				std::cout << " " << p.first << ":" << p.second;
+			std::cout << std::endl;
+		}
+		std::set<std::pair<double, double>> averageArmourShredProportions;
+		for (auto p : smokeBombStackProportions)
+			averageArmourShredProportions.insert(std::make_pair(
+				p.first,
+				(averageArmourShredStacksBallista * (100 + armourShredEffect * ailmentRatio) / 100
+					+ averageArmourShredStacksFalcon + averageArmourShredStacksDiveBomb
+					+ p.second * (100 + armourShredEffect) / 100) * 100));
+		if (verbose >= 2) {
+			std::cout << "AVERAGE ARMOUR SHRED PROPORTIONS:" << std::endl;
+			for (auto p : averageArmourShredProportions)
+				std::cout << " " << p.first << ":" << p.second;
+			std::cout << std::endl;
+		}
+		double averageArmourShred = 0;
+		for (auto p : averageArmourShredProportions)
+			averageArmourShred += p.first * p.second;
+		if (!stacks) averageArmourShred = 0;
 		if (verbose >= 2) std::cout << "AVERAGE ARMOUR SHRED: " << averageArmourShred << std::endl;
+
 		double physArmorShredMore = 100 * (1.2 * averageArmourShred / (80 + 0.05 * pow(105, 2) + 1.2 * averageArmourShred) * 0.3
 			+ 0.0012 * pow(averageArmourShred, 2) / (180 * 105 + 0.0015 * pow(averageArmourShred, 2)) * 0.55);
 		if (verbose >= 2) std::cout << "AVERAGE MORE PHYCICAL DAMAGE FROM ARMOUR SHRED: " << physArmorShredMore << "%" << std::endl;
@@ -972,6 +1000,29 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		return dps;
 	}
 
+}
+
+
+std::set<std::pair<double, double>> BuildMaker::smokeBombShredProportions(bool staticAerial) {
+	if (staticAerial) {
+		return {
+			{0.3, 40},
+			{0.2, 44},
+			{0.3, 48},
+		};
+	}
+	else {
+		return {
+			{0.05, 4},
+			{0.1, 8},
+			{0.1, 12},
+			{0.1, 16},
+			{0.1, 20},
+			{0.1, 24},
+			{0.1, 28},
+			{0.35, 32},
+		};
+	}
 }
 
 void BuildMaker::findBestItems() {
