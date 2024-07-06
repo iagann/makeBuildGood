@@ -844,6 +844,10 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "AVERAGE PHYSICAL SHRED STACKS: " << averagePhysShredStacks << std::endl;
 		double physPen = statSum(currentStats, PHYSICAL_PENETRATION) + averagePhysShredStacks * 2;
 		if (verbose >= 2) std::cout << "TOTAL PHYSICAL PENETRATION: " << physPen << "%" << std::endl;
+		double coldShredChance = statSum(currentStats, CHANCE_TO_SHRED_COLD_RES);
+		if (verbose >= 2) std::cout << "CHANCE TO SHRED COLD RESISTANCE: " << coldShredChance << "%" << std::endl;
+		double averageColdShredStacks = std::min<double>(10, averageStacks * coldShredChance);
+		if (verbose >= 2) std::cout << "AVERAGE COLD SHRED STACKS: " << averageColdShredStacks << std::endl;
 		double lightShredChance = statSum(currentStats, CHANCE_TO_SHRED_LIGHTNING_RES);
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED LIGHTNING RESISTANCE: " << lightShredChance << "%" << std::endl;
 		double averageLightShredStacks = std::min<double>(10, averageStacks * lightShredChance);
@@ -948,9 +952,12 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		double effectiveCritMultiFalcon = cappedCritChanceFalcon * totalCritMultiFalcon + 100 - cappedCritChanceFalcon * 100;
 		if (verbose >= 2) std::cout << "EFFECTIVE CRIT MULTI FALCON: " << effectiveCritMultiFalcon << "%" << std::endl << std::endl;
 
-		double totalPhysHit = flatPhys * (100 + increasedDamage + increasedMinionPhys) / 100 * moreDamage / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMulti / 100);
-		double totalColdHit = flatCold * (100 + increasedDamage + increasedCold * damageRatio) / 100 * moreDamage / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
-		double totalLightHit = flatLight * (100 + increasedDamage) / 100 * moreDamage / 100 * (100 + (averageLightShredStacks + averageShockStacks) * 2) / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
+		double totalPhysHit = flatPhys * (100 + increasedDamage + increasedMinionPhys) / 100
+			* moreDamage / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMulti / 100);
+		double totalColdHit = flatCold * (100 + increasedDamage + increasedCold * damageRatio) / 100
+			* moreDamage / 100 * (100 + (averageColdShredStacks) * 2) / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
+		double totalLightHit = flatLight * (100 + increasedDamage) / 100
+			* moreDamage / 100 * (100 + (averageLightShredStacks + averageShockStacks) * 2) / 100 * (100 + otherArmorShredMore) / 100 * (effectiveCritMulti / 100);
 		double totalHitFalcon = flatPhysFalcon * (100 + increasedDamageFalcon + increasedMinionPhys) / 100 * moreDamageFalcon / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMultiFalcon / 100);
 		double totalHitDiveBomb = flatPhysDiveBomb * (100 + increasedDamageFalcon + increasedMinionPhys) / 100 * moreDamageDiveBomb / 100 * (100 + physPen) / 100 * (100 + physArmorShredMore) / 100 * (effectiveCritMultiFalcon / 100);
 
