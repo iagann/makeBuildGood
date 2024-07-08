@@ -854,7 +854,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 		if (verbose >= 2) std::cout << "AVERAGE LIGHTNING SHRED STACKS: " << averageLightShredStacks << std::endl;
 		double shockChance = statSum(currentStats, SHOCK_CHANCE);
 		if (verbose >= 2) std::cout << "CHANCE TO SHOCK: " << shockChance << "%" << std::endl;
-		double averageShockStacks = std::min<double>(10, averageStacks * shockChance);
+		double averageShockStacks = std::min<double>(10, 4 * (ailmentRatio * hitsPerSecond) / 100 * shockChance);
 		if (verbose >= 2) std::cout << "AVERAGE SHOCK STACKS: " << averageShockStacks << std::endl;
 		double armourShredChance = statSum(currentStats, ARMOUR_SHRED_CHANCE);
 		if (verbose >= 2) std::cout << "CHANCE TO SHRED ARMOUR: " << armourShredChance << "%" << std::endl;
