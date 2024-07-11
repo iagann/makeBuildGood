@@ -321,7 +321,7 @@ void BuildMaker::initPassives() {
 		));
 		passives.insert(std::make_pair(
 			PASSIVE_NAME::CONCENTRATION, Passive<PASSIVE_NAME>(PASSIVE_CLASS_NAME::MARKSMAN, 8)
-			.withStat(STAT_NAME::MORE_DAMAGE, 2)
+			//.withStat(STAT_NAME::MORE_DAMAGE, 2)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 5)
 		));
 		passives.insert(std::make_pair(
@@ -350,7 +350,7 @@ void BuildMaker::initPassives() {
 			.withStat(STAT_NAME::INCREASED_CRITICAL_STRIKE_MULTIPLIER, 5)
 			.withMinimumClassPoints(PASSIVE_CLASS_NAME::MARKSMAN, 20)
 			.withDependency(PASSIVE_NAME::WOUND_MAKER, 1)
-			.withAbsoluteMinimum(5)
+			.withAbsoluteMinimum(0)
 		));
 		// FALCONER
 		passives.insert(std::make_pair(
@@ -463,7 +463,7 @@ void BuildMaker::initSkills() {
 			.withStat(STAT_NAME::INTELLIGENCE, 1)
 			// Aerial Assauilt
 			.withStat(STAT_NAME::MORE_DAMAGE_PER_INTELLIGENCE, 2)
-			.withStat(STAT_NAME::MORE_ATTACK_SPEED, 75)
+			.withStat(STAT_NAME::INCREASED_ATTACK_SPEED, 75)
 			.withStat(STAT_NAME::DEXTERITY, 16)
 			// haste
 			.withStat(STAT_NAME::INCREASED_MOVEMENT_SPEED, 30*1.2)
