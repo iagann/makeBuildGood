@@ -114,6 +114,8 @@ void BuildMaker::makeGoodBuild() {
 		if (verbose >= 1) std::cout << std::endl << "=========================== FINDING BEST BUILD, iteration " << iteration++ << "===========================" << std::endl;
 		prevDps = bestDps;
 		findBestItems();
+		currentDps = calculateDpsIf(currentItemSet);
+		bestDps = currentDps;
 	}
 	if (verbose >= 1) std::cout << std::endl << "NO POSSIBLE CHANGES FOR DPS INCREASE" << std::endl;
 	
@@ -217,22 +219,24 @@ void BuildMaker::makeGoodBuild() {
 	std::cout << bestPassives.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;*/
 	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
 		auto realDps = calculateDpsIf(realPassives);
-		std::cout << std::endl << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
-		for (auto passive : realPassives.getPassives()) {
-			if (bestPassives.getPassivePoints(passive.first) != passive.second) {
-				PassiveCombination<PASSIVE_NAME> changedPassive = realPassives;
-				changedPassive.setPassivePoints(passive.first, passives.at(passive.first).getClass(), bestPassives.getPassivePoints(passive.first));
-				auto ifDps = calculateDpsIf(changedPassive);
-				/*std::cout << changedPassive.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;
-				std::cout << ifDps << std::endl;
-				std::cout << realDps << std::endl;
-				std::cout << bestPassives.getPassivePoints(passive.first) << std::endl;
-				std::cout << passive.second << std::endl;
-				std::cout << ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << std::endl;*/
-				std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << passive.second
-					<< " -> " << bestPassives.getPassivePoints(passive.first)
-					<< ", " << 100 * (ifDps - realDps) / realDps / ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << "% dps per point"
-					<< std::endl;
+		if (bestDps / realDps - 1 > 0.1) { // epsilon
+			std::cout << std::endl << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
+			for (auto passive : realPassives.getPassives()) {
+				if (bestPassives.getPassivePoints(passive.first) != passive.second) {
+					PassiveCombination<PASSIVE_NAME> changedPassive = realPassives;
+					changedPassive.setPassivePoints(passive.first, passives.at(passive.first).getClass(), bestPassives.getPassivePoints(passive.first));
+					auto ifDps = calculateDpsIf(changedPassive);
+					/*std::cout << changedPassive.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;
+					std::cout << ifDps << std::endl;
+					std::cout << realDps << std::endl;
+					std::cout << bestPassives.getPassivePoints(passive.first) << std::endl;
+					std::cout << passive.second << std::endl;
+					std::cout << ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << std::endl;*/
+					std::cout << STRINGS::PASSIVE_NAME_MAP.at(passive.first) << ": " << passive.second
+						<< " -> " << bestPassives.getPassivePoints(passive.first)
+						<< ", " << 100 * (ifDps - realDps) / realDps / ((int)bestPassives.getPassivePoints(passive.first) - (int)passive.second) << "% dps per point"
+						<< std::endl;
+				}
 			}
 		}
 	}
@@ -1015,8 +1019,51 @@ void BuildMaker::findBestItems() {
 	std::map<ITEM_TYPE, std::set<int>> usedItems = usedItemsInit;
 	
 	for (auto slotItems : items.getAllItemSet()) {
-		/*if (slotItems.second.size() < 2)
-			continue;*/
+		if (slotItems.second.size() == 0)
+			continue;
+		if (slotItems.second.size() == 1) {
+			currentItemSet.changeItem(slotItems.first, slotItems.second[0]);
+			bestItemSet = currentItemSet;
+			continue;
+		}
+
+		if (slotItems.first == RING_LEFT_SLOT && slotItems.second.size() <= 2) {
+			currentItemSet.changeItem(RING_LEFT_SLOT, slotItems.second[0]);
+			if (slotItems.second.size() >= 2)
+				currentItemSet.changeItem(RING_RIGHT_SLOT, slotItems.second[1]);
+			bestItemSet = currentItemSet;
+			continue;
+		}
+		if (slotItems.first == RING_RIGHT_SLOT && slotItems.second.size() == 2)
+			continue;
+
+		if (slotItems.first == BIG_IDOL_1_SLOT && slotItems.second.size() <= 4) {
+			currentItemSet.changeItem(BIG_IDOL_1_SLOT, slotItems.second[0]);
+			if (slotItems.second.size() >= 2)
+				currentItemSet.changeItem(BIG_IDOL_2_SLOT, slotItems.second[1]);
+			if (slotItems.second.size() >= 3)
+				currentItemSet.changeItem(BIG_IDOL_3_SLOT, slotItems.second[2]);
+			if (slotItems.second.size() >= 4)
+				currentItemSet.changeItem(BIG_IDOL_4_SLOT, slotItems.second[3]);
+			bestItemSet = currentItemSet;
+			continue;
+		}
+		if ((slotItems.first == BIG_IDOL_2_SLOT || slotItems.first == BIG_IDOL_3_SLOT || slotItems.first == BIG_IDOL_4_SLOT) && slotItems.second.size() <= 4)
+			continue;
+
+		if (slotItems.first == SMALL_IDOL_1_SLOT && slotItems.second.size() <= 4) {
+			currentItemSet.changeItem(SMALL_IDOL_1_SLOT, slotItems.second[0]);
+			if (slotItems.second.size() >= 2)
+				currentItemSet.changeItem(SMALL_IDOL_2_SLOT, slotItems.second[1]);
+			if (slotItems.second.size() >= 3)
+				currentItemSet.changeItem(SMALL_IDOL_3_SLOT, slotItems.second[2]);
+			if (slotItems.second.size() >= 4)
+				currentItemSet.changeItem(SMALL_IDOL_4_SLOT, slotItems.second[3]);
+			bestItemSet = currentItemSet;
+			continue;
+		}
+		if ((slotItems.first == SMALL_IDOL_2_SLOT || slotItems.first == SMALL_IDOL_3_SLOT || slotItems.first == SMALL_IDOL_4_SLOT) && slotItems.second.size() <= 4)
+			continue;
 
 		//if (verbose >= 2)
 		std::cout << std::endl << "ANALYZING " << STRINGS::ITEM_SLOT_MAP.at(slotItems.first) << std::endl;
