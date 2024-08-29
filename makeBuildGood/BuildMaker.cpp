@@ -219,7 +219,7 @@ void BuildMaker::makeGoodBuild() {
 	std::cout << bestPassives.toString(STRINGS::PASSIVE_NAME_MAP) << std::endl;*/
 	if (realPassives != PassiveCombination<PASSIVE_NAME>() && realPassives != bestPassives) {
 		auto realDps = calculateDpsIf(realPassives);
-		if (bestDps / realDps - 1 > 0.1) { // epsilon
+		if (bestDps / realDps - 1 > 0) { // epsilon
 			std::cout << std::endl << "Change passives NOW for more DPS " << realDps << " -> " << bestDps << " +" << (bestDps / realDps - 1) * 100 << "%: " << std::endl;
 			for (auto passive : realPassives.getPassives()) {
 				if (bestPassives.getPassivePoints(passive.first) != passive.second) {
@@ -1019,14 +1019,16 @@ void BuildMaker::findBestItems() {
 	std::map<ITEM_TYPE, std::set<int>> usedItems = usedItemsInit;
 	
 	for (auto slotItems : items.getAllItemSet()) {
+
 		if (slotItems.second.size() == 0)
 			continue;
+		/*
 		if (slotItems.second.size() == 1) {
 			currentItemSet.changeItem(slotItems.first, slotItems.second[0]);
 			bestItemSet = currentItemSet;
 			continue;
 		}
-
+		
 		if (slotItems.first == RING_LEFT_SLOT && slotItems.second.size() <= 2) {
 			currentItemSet.changeItem(RING_LEFT_SLOT, slotItems.second[0]);
 			if (slotItems.second.size() >= 2)
@@ -1064,7 +1066,7 @@ void BuildMaker::findBestItems() {
 		}
 		if ((slotItems.first == SMALL_IDOL_2_SLOT || slotItems.first == SMALL_IDOL_3_SLOT || slotItems.first == SMALL_IDOL_4_SLOT) && slotItems.second.size() <= 4)
 			continue;
-
+		*/
 		//if (verbose >= 2)
 		std::cout << std::endl << "ANALYZING " << STRINGS::ITEM_SLOT_MAP.at(slotItems.first) << std::endl;
 		currentDpsCopy = bestDps;
