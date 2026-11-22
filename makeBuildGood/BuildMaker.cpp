@@ -111,7 +111,7 @@ void BuildMaker::makeGoodBuild() {
 	bestDps = currentDps;
 	int iteration = 1;
 	while (prevDps < bestDps) {
-		if (verbose >= 1) std::cout << std::endl << "=========================== FINDING BEST BUILD, iteration " << iteration++ << "===========================" << std::endl;
+		if (verbose >= 1) std::cout << std::endl << "=========================== FINDING BEST BUILD, iteration " << iteration++ << " ===========================" << std::endl;
 		prevDps = bestDps;
 		findBestItems();
 		currentDps = calculateDpsIf(currentItemSet);
@@ -455,7 +455,7 @@ void BuildMaker::initSkills() {
 	{
 		skills.insert(std::make_pair(
 			SKILL_PASSIVE_NAME::BASE_SKILL, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 1)
-			.withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 20) // actual is 40, but effectiveness is 40
+			.withStat(STAT_NAME::FLAT_MINION_PHYSICAL_DAMAGE, 20) // actual is 40, but effectiveness is 200%
 			.withStat(STAT_NAME::BASE_MINION_CRITICAL_STRIKE_CHANCE, 5)
 			.withStat(STAT_NAME::INCREASED_MINION_CRITICAL_STRIKE_MULTIPLIER, 200)
 			.withStat(STAT_NAME::INCREASED_MINION_DAMAGE_PER_DEXTERITY, 4)
@@ -466,7 +466,7 @@ void BuildMaker::initSkills() {
 			.withStat(STAT_NAME::DEXTERITY, 16)
 			.withStat(STAT_NAME::INTELLIGENCE, 1)
 			// Aerial Assauilt
-			.withStat(STAT_NAME::MORE_DAMAGE_PER_INTELLIGENCE, 2)
+			.withStat(STAT_NAME::MORE_DAMAGE_PER_INTELLIGENCE, 1)
 			.withStat(STAT_NAME::INCREASED_ATTACK_SPEED, 75)
 			.withStat(STAT_NAME::DEXTERITY, 16)
 			// haste
@@ -551,9 +551,9 @@ void BuildMaker::initSkills() {
 			.withAbsoluteMinimum(2)
 		));
 		skills.insert(std::make_pair(
-			SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 5)
+			SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, Passive<SKILL_PASSIVE_NAME>(PASSIVE_CLASS_NAME::BASE, 3)
 			.withDependency(SKILL_PASSIVE_NAME::CARE_PACKAGE, 2)
-			.withStat(STAT_NAME::MORE_DAMAGE, 20)
+			.withStat(STAT_NAME::MORE_DAMAGE, 15)
 			.withAbsoluteMinimum(3)
 		));
 		skills.insert(std::make_pair(
@@ -576,10 +576,10 @@ void BuildMaker::initSkills() {
 	
 	auto shared1 = initCombo;
 	shared1.setPassivePoints(SKILL_PASSIVE_NAME::RAPID_FIRE, PASSIVE_CLASS_NAME::BASE, 2); // 1
-	shared1.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 1); // 1
-	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 4); // 1
+	shared1.setPassivePoints(SKILL_PASSIVE_NAME::CONTAMINATING_SHOTS, PASSIVE_CLASS_NAME::BASE, 0); // 1
+	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 3); // 1
 	skillSet.push_back(shared1);
-	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 5); // 2
+	shared1.setPassivePoints(SKILL_PASSIVE_NAME::ELIXIR_OF_CONSTRUCTION, PASSIVE_CLASS_NAME::BASE, 3); // 2
 
 	skillSetKestrel.push_back(shared1);
 	
@@ -794,6 +794,7 @@ double BuildMaker::calculateDpsIf(PassiveCombination<PASSIVE_NAME> ifPassives) {
 					increase += 2;
 			}
 			hitsPerSecond = 6 * eventCount / duration;
+			if (verbose >= 2 && quickload) std::cout << "QUICKLOAD INCREASE: " << (increase - increasedAttackSpeed) << std::endl;
 			if (verbose >= 2) std::cout << "BALLISTA HITS PER LIFETIME: " << eventCount << std::endl;
 			if (verbose >= 2) std::cout << "AVERAGE BALLISTA HITS PER SECOND: " << eventCount / duration << std::endl;
 			if (verbose >= 2) std::cout << "TOTAL BALLISTA HITS PER SECOND: " << hitsPerSecond << std::endl;
